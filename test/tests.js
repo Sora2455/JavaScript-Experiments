@@ -15,18 +15,26 @@ const {describe, before, after, it} = require("mocha");
 const {assert} = require("chai");
 
 const siteUrl = "http://localhost:8080/";
-const browsers = ["Firefox", "Chrome", "Internet Explorer", "Edge", "noscript"];
+const browsers = ["Firefox", "Chrome", "IE8", "IE9", "IE10", "IE11", "Edge", "noscript"];
 let server;
+let messageServer;
 
 describe("Cross-browser testing", async function() {
     before(async function() {
         server = fork("server.js");
+        messageServer = function(value) {
+            return new Promise(function(resolve, reject) {
+                server.send(value, function(error) {
+                    if (error) { reject(error); }
+                    else { resolve(); }
+                });
+            });
+        }
     });
 
     after(async function() {
-        server.send("shutdown", function() {
-            server.disconnect();
-        });
+        await messageServer("shutdown");
+        server.disconnect();
     });
 
     for (let i = 0; i < browsers.length; i++) {
@@ -36,6 +44,19 @@ describe("Cross-browser testing", async function() {
         describe(`General site tests - ${browser}`, async function() {
             this.timeout(60000);
             before(async function() {
+                let version = "edge";
+                switch (browser) {
+                    case "IE8":
+                        version = "8";
+                        break;
+                    case "IE9":
+                        version = "9";
+                        break;
+                    case "IE10":
+                        version = "10";
+                        break;
+                }
+                await messageServer({set: "ieVersion", value: version});
                 driver = await getBrowserSession(browsers[i]);
             });
     
@@ -101,11 +122,8 @@ async function getBrowserSession(type) {
             const optionsE = new edge.Options();
             const serviceE = new edge.ServiceBuilder(edgeDriverPath).build();
             return edge.Driver.createSession(optionsE, serviceE);
-        case "ie":
-        case "internet explorer":
+        default:
             const optionsI = new ie.Options().setExtractPath(ieDriverPath);
             return ie.Driver.createSession(optionsI);
-        default:
-            throw new Error(`Unrecognised browser session type ${type}`);
     }
 }

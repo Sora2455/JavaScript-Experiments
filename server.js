@@ -4,6 +4,8 @@ const serveStatic = require('serve-static');
 const Canvas = require('canvas');
 const qrCode = require("./build/noModules/modules/QRCodeRenderer");
 
+let ieVersion = "edge";
+
 const server = connect()
 // gzip/deflate outgoing responses
 .use(compression())
@@ -25,6 +27,7 @@ function setHeaders(res, path){
         res.setHeader("Referrer-Policy", "same-origin");
         res.setHeader("X-Frame-Options", "sameorigin");
         res.setHeader("X-Content-Type-Options", "nosniff");
+        res.setHeader("X-UA-Compatible", `IE=${ieVersion}`);
         res.setHeader("TK", "N");
     }
     addMimeTypes(res, path);
@@ -110,5 +113,9 @@ process.on("message", (m) => {
     if (m === "shutdown") {
         //A parent process has asked us to stop
         server.close();
+    } else if (typeof m === "object") {
+        if (m.set === "ieVersion" && typeof m.value === "string") {
+            ieVersion = m.value;
+        }
     }
 });
