@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		"target": "es3",
+		"module": "amd",
+        "sourceMap": true,
+        "noImplicitAny": true,
+        "removeComments": true,
+        "lib": [
+            "webworker",
+            "es6",
+            "scripthost"
+        ]
+	}
+}

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en-AU" dir="ltr">
+    <head>
+        <meta charset="utf-8" />
+        <title>JavaScript experiments demo - QR Code</title>
+        <!--[if lte IE 8]><link rel="stylesheet" href="ie8.css" /><![endif]-->
+        <link rel="stylesheet" href="style.css" />
+        <script src="modules/qrMain.js" type="module" async></script>
+        <script src="noModules/qrMain.min.js" nomodule async></script>
+    </head>
+    <body>
+        <h2>QR Code generation</h2>
+        <div class="left">
+            <form method="GET" id="QRCodeFrom" action="">
+                <p>
+                    <label for="QRCodeInput">Enter code here:</label>
+                    <input type="text" id="QRCodeInput" name="QRCode"/>
+                    <input type="submit" value="Generate" id="QRCodeGenerate"/>
+                </p>
+            </form>
+        </div>
+        <div class="right">
+            <div id="QRCodeResult"></div>
+            <noscript>
+                <img src="qrCode.png" height="360" width="360"/>
+            </noscript>
+        </div>
+    </body>
+</html>

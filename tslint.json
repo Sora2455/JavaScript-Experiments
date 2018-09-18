@@ -1,0 +1,13 @@
+{
+    "extends": "tslint:recommended",
+    "rules": {
+        "trailing-comma": [
+            true,
+            {
+                "esSpecCompliant": true
+            }
+        ],
+        "max-classes-per-file": false,
+        "no-bitwise": false
+    }
+}
