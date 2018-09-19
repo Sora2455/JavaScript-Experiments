@@ -69,6 +69,18 @@ describe("Cross-browser testing", async function() {
                 await driver.manage().window().maximize();
                 await saveScreenshot(driver, `Main - ${browser}`);
             });
+
+            it("Can see the second section", async function() {
+                await driver.get(`${siteUrl}#2`);
+                await driver.manage().window().maximize();
+                await saveScreenshot(driver, `Second - ${browser}`);
+            });
+
+            it("Can see the third section", async function() {
+                await driver.get(`${siteUrl}#3`);
+                await driver.manage().window().maximize();
+                await saveScreenshot(driver, `Third - ${browser}`);
+            });
         });
     }
 });

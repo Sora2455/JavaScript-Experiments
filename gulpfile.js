@@ -17,6 +17,7 @@ var buffer = require('vinyl-buffer');
 var merge = require('merge-stream');
 var glob = require('glob');
 var path = require('path');
+const {MathMlReplacer} = require("math-ml-now");
 var exec = require('child_process').exec;
 
 var polyfillRegex = /\/\/ startpolyfill[\s\S]*?\/\/ endpolyfill/g;
@@ -178,13 +179,20 @@ gulp.task("compileBytecode", function(cb) {
 
 gulp.task("scripts", ["moduleCode", "noModuleCode", "workerCode", "polyfills"]);
 
-gulp.task("media", function() {
+gulp.task("media", ["html"], function() {
     return gulp.src("src/media/*{png,jpg}")
                 .pipe(gulp.dest("build/media"));
 });
 
 gulp.task("html", function() {
+    const replacer = new MathMlReplacer({
+        formatName: "TeX",
+        imageFolder: "/src/media/"
+    });
+
     return gulp.src("src/html/*.html")
+                .pipe(replacer)
+                .pipe(replace("/src/", "/"))
                 .pipe(htmlmin({
                     collapseWhitespace: true,
                     conservativeCollapse: true
