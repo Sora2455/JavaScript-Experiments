@@ -1,4 +1,3 @@
-const {Builder, By, Key, until} = require("selenium-webdriver");
 const firefox = require("selenium-webdriver/firefox");
 const chrome = require("selenium-webdriver/chrome");
 const ie = require('selenium-webdriver/ie');
