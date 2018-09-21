@@ -1,3 +1,4 @@
+const {until, By} = require("selenium-webdriver");
 const firefox = require("selenium-webdriver/firefox");
 const chrome = require("selenium-webdriver/chrome");
 const ie = require('selenium-webdriver/ie');
@@ -66,6 +67,12 @@ describe("Cross-browser testing", async function() {
             it("Can access the test site", async function() {
                 await driver.get(siteUrl);
                 await driver.manage().window().maximize();
+                await driver.switchTo().frame(0);
+                if (browser != "noscript") {
+                    const generateButton = await driver.findElement(By.id("QRCodeGenerate"));
+                    await driver.wait(until.elementIsNotVisible(generateButton), 1000);
+                }
+                await driver.switchTo().frame(null);
                 await saveScreenshot(driver, `Main - ${browser}`);
             });
 
@@ -78,6 +85,8 @@ describe("Cross-browser testing", async function() {
             it("Can see the third section", async function() {
                 await driver.get(`${siteUrl}#3`);
                 await driver.manage().window().maximize();
+                const lazyImage = By.css("img[src='/media/you-have-gone-back-in-time.jpg']");
+                await driver.wait(until.elementLocated(lazyImage), 1000);
                 await saveScreenshot(driver, `Third - ${browser}`);
             });
         });
