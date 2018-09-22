@@ -134,7 +134,6 @@ new ReadyManager().whenReady(() => {
         document.getElementById("QRCodeGenerate").style.display = "none";
         // don't reload the iFrame on form submission (like the enter key, for example)
         document.getElementById("QRCodeFrom").onsubmit = (e) => {
-            e.preventDefault();
             return false;
         };
     }

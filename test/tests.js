@@ -1,4 +1,4 @@
-const {until, By} = require("selenium-webdriver");
+const {until, By, Key} = require("selenium-webdriver");
 const firefox = require("selenium-webdriver/firefox");
 const chrome = require("selenium-webdriver/chrome");
 const ie = require('selenium-webdriver/ie');
@@ -72,6 +72,8 @@ describe("Cross-browser testing", async function() {
                     const generateButton = await driver.findElement(By.id("QRCodeGenerate"));
                     await driver.wait(until.elementIsNotVisible(generateButton), 1000);
                 }
+                const tempText = 'webdriver';
+                await driver.findElement(By.id("QRCodeInput")).sendKeys(tempText, Key.RETURN);
                 await driver.switchTo().frame(null);
                 await saveScreenshot(driver, `Main - ${browser}`);
             });
