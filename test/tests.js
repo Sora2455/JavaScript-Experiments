@@ -1,4 +1,4 @@
-const {until, By, Key} = require("selenium-webdriver");
+const {until, By, Key, Condition} = require("selenium-webdriver");
 const firefox = require("selenium-webdriver/firefox");
 const chrome = require("selenium-webdriver/chrome");
 const ie = require('selenium-webdriver/ie');
@@ -68,13 +68,21 @@ describe("Cross-browser testing", async function() {
                 await driver.get(siteUrl);
                 await driver.manage().window().maximize();
                 await driver.switchTo().frame(0);
-                if (browser != "noscript") {
+                if (browser !== "noscript") {
                     const generateButton = await driver.findElement(By.id("QRCodeGenerate"));
                     await driver.wait(until.elementIsNotVisible(generateButton), 1000);
                 }
                 const tempText = 'webdriver';
                 await driver.findElement(By.id("QRCodeInput")).sendKeys(tempText, Key.RETURN);
-                await driver.switchTo().frame(null);
+                if (browser === "noscript") {
+                    const qrCodeImage = By.css("img[src='qrCode.png']");
+                    const qrCodeImageElement = await driver.findElement(qrCodeImage);
+                    await driver.wait(until.stalenessOf(qrCodeImageElement), 3000);
+                    await untilImageIsLoaded(driver, qrCodeImage);
+                } else {
+                    await driver.findElement(By.id("QRCodeResult")).click();
+                }
+                await driver.switchTo().defaultContent();
                 await saveScreenshot(driver, `Main - ${browser}`);
             });
 
@@ -95,16 +103,25 @@ describe("Cross-browser testing", async function() {
     }
 });
 
-/* (async function example() {
-    let driver = getBrowserSession(browsers[2]);
-    try {
-        await driver.get('http://www.google.com/ncr');
-        await driver.findElement(By.name('q')).sendKeys('webdriver', Key.RETURN);
-        await driver.wait(until.titleIs('webdriver - Google Search'), 1000);
-    } finally {
-        await driver.quit();
-    }
-})(); */
+/**
+ * Waits until a given image is loaded
+ * @param {Diver} driver The WebDriver object
+ * @param {By} locator The selector that locates the image to wait on
+ */
+async function untilImageIsLoaded(driver, locator) {
+    const el = await driver.wait(until.elementLocated(locator), 3000);
+    await driver.wait(checkIfImageLoaded(el), 3000);
+}
+
+/**
+ * Returns a Conditon on the loaded state of an image
+ * @param {WebElement} element The WebElement representing the image we're checking
+ */
+function checkIfImageLoaded(element) {
+    return new Condition("for image to load", async (driver) => {
+        return await driver.executeScript("return arguments[0].src && arguments[0].complete", element);
+    });
+}
 
 /**
  * Save a screenshot of what the Web Driver currently sees
