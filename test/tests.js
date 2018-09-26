@@ -96,7 +96,7 @@ describe("Cross-browser testing", async function() {
                 await driver.get(`${siteUrl}#3`);
                 await driver.manage().window().maximize();
                 const lazyImage = By.css("img[src='/media/you-have-gone-back-in-time.jpg']");
-                await driver.wait(until.elementLocated(lazyImage), 1000);
+                await untilImageIsLoaded(driver, lazyImage);
                 await saveScreenshot(driver, `Third - ${browser}`);
             });
         });
