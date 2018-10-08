@@ -25,8 +25,14 @@ interface HTMLFormElement {
     p: HTMLButtonElement;
 }
 
-if (!HTMLFormElement.prototype.reportValidity && !!HTMLFormElement.prototype.checkValidity) {
-    HTMLFormElement.prototype.reportValidity = () => {
+if (!HTMLFormElement.prototype.checkValidity) {
+    HTMLFormElement.prototype.checkValidity = () => {
+        return true;
+    };
+}
+
+if (!HTMLFormElement.prototype.reportValidity) {
+    HTMLFormElement.prototype.reportValidity = function() {
         const f = this as HTMLFormElement;
         if (f.checkValidity()) {
             return true;

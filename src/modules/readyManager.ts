@@ -75,7 +75,7 @@ export const Requirement: IFeatureList = {
     },
     reportValidity: {
         polyfillSrc: "/polyfills/es3/ReportValidity.js",
-        test: () => !HTMLFormElement.prototype.reportValidity && !!HTMLFormElement.prototype.checkValidity
+        test: () => !HTMLFormElement.prototype.checkValidity || !HTMLFormElement.prototype.reportValidity
     },
     requestAnimationFrame: {
         polyfillSrc: "/polyfills/es3/RequestAnimationFrame.js",
