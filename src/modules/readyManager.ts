@@ -73,6 +73,10 @@ export const Requirement: IFeatureList = {
         polyfillSrc: "/polyfills/es3/WebWorker.js",
         test: () => typeof Worker === "function"
     },
+    reportValidity: {
+        polyfillSrc: "/polyfills/es3/ReportValidity.js",
+        test: () => !HTMLFormElement.prototype.reportValidity && !!HTMLFormElement.prototype.checkValidity
+    },
     requestAnimationFrame: {
         polyfillSrc: "/polyfills/es3/RequestAnimationFrame.js",
         test: () => typeof requestAnimationFrame === "function"
