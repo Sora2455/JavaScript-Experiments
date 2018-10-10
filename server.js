@@ -25,7 +25,11 @@ function setHeaders(res, path){
         res.setHeader("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; " +
             "base-uri 'none'; form-action 'self'; frame-ancestors 'self'");
         res.setHeader("Referrer-Policy", "same-origin");
-        res.setHeader("Feature-Policy", "sync-xhr 'none'; document-write 'none';");
+        res.setHeader("Feature-Policy", "sync-xhr 'none'; document-write 'none'; vertical-scroll 'none'; " +
+            "sync-script 'none'; image-compression 'none'; legacy-image-formats 'none'; " +
+            "max-downscaling-image 'none'; unsized-media 'none'; accelerometer 'none'; " +
+            "ambient-light-sensor 'none'; camera 'none'; gyroscope 'none'; magnetometer 'none'; " +
+            "microphone 'none'; fullscreen 'none';");
         res.setHeader("X-Frame-Options", "sameorigin");
         res.setHeader("X-Content-Type-Options", "nosniff");
         res.setHeader("X-UA-Compatible", `IE=${ieVersion}`);
