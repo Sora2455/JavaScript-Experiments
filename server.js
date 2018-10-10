@@ -25,6 +25,7 @@ function setHeaders(res, path){
         res.setHeader("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; " +
             "base-uri 'none'; form-action 'self'; frame-ancestors 'self'");
         res.setHeader("Referrer-Policy", "same-origin");
+        res.setHeader("Feature-Policy", "sync-xhr 'none'; document-write 'none';");
         res.setHeader("X-Frame-Options", "sameorigin");
         res.setHeader("X-Content-Type-Options", "nosniff");
         res.setHeader("X-UA-Compatible", `IE=${ieVersion}`);
