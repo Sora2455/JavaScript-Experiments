@@ -1,0 +1,22 @@
+header {
+    display: none;
+}
+
+main {
+    top: 0;
+    height: 100%;
+    max-height: none;
+}
+
+main section {
+    height: 100%;
+    max-height: none;
+}
+
+main section:not(:target) {/* stylelint-disable-line */
+    display: none;
+}
+
+main section iframe {
+    height: 100%;
+}
