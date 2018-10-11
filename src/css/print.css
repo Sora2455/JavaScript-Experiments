@@ -21,3 +21,7 @@ body main section {
 body main section[data-print-subject] {
     display: block;
 }
+
+.warningMessagePopup {
+    display: none;
+}
