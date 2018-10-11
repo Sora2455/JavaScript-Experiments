@@ -40,10 +40,8 @@ export function copyTextToClipboard(text: string): void {
 
         try {
             document.execCommand("copy");
-        } catch (err) {
-            console.error("Fallback: Oops, unable to copy", err);
+        } finally {
+            document.body.removeChild(textArea);
         }
-
-        document.body.removeChild(textArea);
     }
 }
