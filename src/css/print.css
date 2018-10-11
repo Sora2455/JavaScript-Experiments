@@ -13,10 +13,11 @@ main section {
     max-height: none;
 }
 
-main section:not(:target) {/* stylelint-disable-line */
+body main section {
     display: none;
 }
 
-main section iframe {
-    height: 100%;
+/* uncss:ignore */
+body main section[data-print-subject] {
+    display: block;
 }
