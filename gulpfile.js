@@ -1,29 +1,34 @@
 "use strict";
-var gulp = require("gulp");
-var postcss = require('gulp-postcss');
-var cssnano = require('cssnano');
-var uncss = require('uncss').postcssPlugin;
-var ts = require("gulp-typescript");
-var replace = require('gulp-replace');
-var uglifyEs = require('uglify-es');
-var composer = require('gulp-uglify/composer');
-var uglify = composer(uglifyEs, console);
-var sourcemaps = require('gulp-sourcemaps');
-var htmlmin = require('gulp-htmlmin');
-var del = require("del");
-var browserify = require('browserify');
-var source = require('vinyl-source-stream');
-var buffer = require('vinyl-buffer');
-var merge = require('merge-stream');
-var glob = require('glob');
-var path = require('path');
+const gulp = require("gulp");
+const gulpMerge = require("gulp-merge");
+const postcss = require('gulp-postcss');
+const cssnano = require('cssnano');
+const uncss = require('uncss').postcssPlugin;
+const ts = require("gulp-typescript");
+const replace = require('gulp-replace');
+const extReplace = require("gulp-ext-replace");
+const uglifyEs = require('uglify-es');
+const composer = require('gulp-uglify/composer');
+const uglify = composer(uglifyEs, console);
+const sourcemaps = require('gulp-sourcemaps');
+const htmlmin = require('gulp-htmlmin');
+const del = require("del");
+const browserify = require('browserify');
+const source = require('vinyl-source-stream');
+const buffer = require('vinyl-buffer');
+const merge = require('merge-stream');
+const glob = require('glob');
+const path = require('path');
 const {MathMlReplacer} = require("math-ml-now");
-var exec = require('child_process').exec;
+const imagemin = require('gulp-imagemin');
+const imageminWebp = require('imagemin-webp');
+const exec = require('child_process').exec;
 
-var polyfillRegex = /\/\/ startpolyfill[\s\S]*?\/\/ endpolyfill/g;
 
-var oldModuleOptions = {ie8:true};
-var newModuleOptions = {safari10:true};
+const polyfillRegex = /\/\/ startpolyfill[\s\S]*?\/\/ endpolyfill/g;
+
+const oldModuleOptions = {ie8:true};
+const newModuleOptions = {safari10:true};
 
 gulp.task("newModules", function(){
     return gulp.src("src/modules/*.ts")
@@ -84,7 +89,7 @@ gulp.task("compileNoModuleCode", ["oldModules"], function() {
 });
 
 gulp.task("noModuleCode", ["compileNoModuleCode"], function() {
-    var files = glob.sync('build/noModules/*.js');
+    const files = glob.sync('build/noModules/*.js');
     return merge(files.map(function(file) {
         return browserify({
             entries: file,
@@ -121,7 +126,7 @@ gulp.task("compileWorkerCode", function() {
 });
 
 gulp.task("workerCode", ["compileWorkerCode", "compileNoModuleCode"], function() {
-    var files = glob.sync('build/workers/*.js');
+    const files = glob.sync('build/workers/*.js');
     return merge(files.map(function(file) {
         return browserify({
             entries: file,
@@ -180,8 +185,17 @@ gulp.task("compileBytecode", function(cb) {
 gulp.task("scripts", ["moduleCode", "noModuleCode", "workerCode", "polyfills"]);
 
 gulp.task("media", ["html"], function() {
-    return gulp.src("src/media/*{png,jpg}")
-                .pipe(gulp.dest("build/media"));
+    return gulpMerge(
+        gulp.src("src/media/*{png,jpg}")
+            .pipe(imagemin([
+                imageminWebp()
+            ]))
+            .pipe(extReplace(".webp"))
+            .pipe(gulp.dest("build/media")),
+        gulp.src("src/media/*{png,jpg,gif,svg}")
+            .pipe(imagemin())
+            .pipe(gulp.dest("build/media"))
+    );
 });
 
 gulp.task("html", function() {
