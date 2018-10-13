@@ -10,19 +10,19 @@ export function loadBytecode(url: string, stdlib: any, foreign: any, pages: numb
     if ("WebAssembly" in window) {
         const buffer = new ArrayBuffer(0x10000 * pages);
         url = `${url}.js`;
-        loadAsmJs(url, stdlib, foreign, buffer, exports => {
+        loadAsmJs(url, stdlib, foreign, buffer, (exports) => {
             if (!exports) throw new Error("Unable to load wasm code!");
             callback(exports, buffer);
         });
     } else if (typeof ArrayBuffer === "function") {
         const buffer = new ArrayBuffer(0x10000 * pages);
         url = url.replace(".wasm", ".asm.js");
-        loadAsmJs(url, stdlib, foreign, buffer, exports => {
+        loadAsmJs(url, stdlib, foreign, buffer, (exports) => {
             if (!exports) throw new Error("Unable to load asm.js code!");
             callback(exports, buffer);
         });
     } else {
-        throw new Error("This browser doesn't support ArrayBuffer (i.e. older than IE10)!")
+        throw new Error("This browser doesn't support ArrayBuffer (i.e. older than IE10)!");
     }
 }
 
@@ -50,7 +50,9 @@ interface WebAssemblyInstance {
 }
 
 interface WebAssemblyMemoryDescriptor {
-    /**The initial size of the WebAssembly Memory, in units of WebAssembly pages (64KB). */
+    /**
+     * The initial size of the WebAssembly Memory, in units of WebAssembly pages (64KB).
+     */
     initial: number;
     /**
      * The maximum size the WebAssembly Memory is allowed to grow to, in units of WebAssembly pages (64KB).
@@ -61,15 +63,17 @@ interface WebAssemblyMemoryDescriptor {
     maximum?: number;
 }
 
-interface WebAssemblyMemory {
-    new(options: WebAssemblyMemoryDescriptor): WebAssemblyMemory;
-    /**An accessor property that returns the buffer contained in the memory. */
-    buffer: ArrayBuffer;
+declare class WebAssemblyMemory {
+    /**
+     * An accessor property that returns the buffer contained in the memory.
+     */
+    public buffer: ArrayBuffer;
     /**
      * The grow() protoype method of the Memory object increases the size of
      * the memory instance by a specified number of WebAssembly pages (64KB).
      */
-    grow: (pages: number) => void;
+    public grow: (pages: number) => void;
+    constructor(options: WebAssemblyMemoryDescriptor);
 }
 
 interface WebAssemblyTable {
@@ -90,9 +94,13 @@ interface WebAssembleTableDescriptor {
      * At the moment this can only have a value of "anyfunc" (functions).
      */
     element: string;
-    /**The initial number of elements of the WebAssembly Table. */
+    /**
+     * The initial number of elements of the WebAssembly Table.
+     */
     initial: number;
-    /**The maximum number of elements the WebAssembly Table is allowed to grow to. */
+    /**
+     * The maximum number of elements the WebAssembly Table is allowed to grow to.
+     */
     maximum?: number;
 }
 
@@ -104,19 +112,19 @@ const storeName = "wasm-cache";
  * @link https://github.com/mdn/webassembly-examples/blob/master/wasm-utils.js
  */
 function loadWebAssembly(url: string, callback: (instance: WebAssemblyInstance) => void, importObject?: any): void {
-    try{
-        openDatabase(db => {
+    try {
+        openDatabase((db) => {
             if (!db) throw new Error("Unable to open database!");
             // Now see if we already have a compiled Module with key 'url' in 'db':
-            return lookupInDatabase(db, url, module => {
-                if (module){
+            return lookupInDatabase(db, url, (module) => {
+                if (module) {
                     // We do! Instantiate it with the given import object.
                     (WebAssembly.instantiate(module, importObject) as Promise<WebAssemblyInstance>)
                         .then(callback);
                 } else {
                     // Nope! Compile from scratch and then store the compiled Module in 'db'
                     // with key 'url' for next time.
-                    return fetchWebassembly(url, importObject).then(results => {
+                    return fetchWebassembly(url, importObject).then((results) => {
                         storeInDatabase(db, url, results.module);
                         callback(results.instance);
                     });
@@ -128,7 +136,7 @@ function loadWebAssembly(url: string, callback: (instance: WebAssemblyInstance) 
         // to simply fetching and compiling the module and don't try to store the
         // results.
         console.error(e);
-        fetchWebassembly(url, importObject).then(results => {
+        fetchWebassembly(url, importObject).then((results) => {
             callback(results.instance);
         });
     }
@@ -136,7 +144,7 @@ function loadWebAssembly(url: string, callback: (instance: WebAssemblyInstance) 
 
 function openDatabase(callback: (database: IDBDatabase) => void): void {
     const request = indexedDB.open(dbName, 1);
-    request.onerror = () => { callback(null) };
+    request.onerror = () => { callback(null); };
     request.onsuccess = () => { callback(request.result); };
     request.onupgradeneeded = () => {
         const db = request.result as IDBDatabase;
@@ -145,7 +153,7 @@ function openDatabase(callback: (database: IDBDatabase) => void): void {
     };
 }
 
-function fetchWebassembly(url: string, importObject?: any): Promise<WebAssemblyResult>{
+function fetchWebassembly(url: string, importObject?: any): Promise<WebAssemblyResult> {
     // all browsers that support WebAssembly support fetch
     const fetchedBytes = fetch(url);
     if ("instantiateStreaming" in WebAssembly) {
@@ -153,7 +161,7 @@ function fetchWebassembly(url: string, importObject?: any): Promise<WebAssemblyR
     } else {
         return fetchedBytes.then(response =>
             response.arrayBuffer()
-        ).then(bytes =>
+        ).then((bytes) =>
             WebAssembly.instantiate(bytes, importObject) as Promise<WebAssemblyResult>
         );
     }
@@ -163,10 +171,10 @@ function fetchWebassembly(url: string, importObject?: any): Promise<WebAssemblyR
  * Checks the database to see if we have loaded this module before
  */
 function lookupInDatabase(db: IDBDatabase, url: string,
-    callback: (module: WebAssemblyModule) => void): void {
+                          callback: (module: WebAssemblyModule) => void): void {
     const store = db.transaction([storeName]).objectStore(storeName);
     const request = store.get(url);
-    request.onerror = () => { callback(null) };
+    request.onerror = () => { callback(null); };
     request.onsuccess = () => {
         if (request.result && request.result.module)
             callback(request.result.module);
@@ -180,7 +188,7 @@ function lookupInDatabase(db: IDBDatabase, url: string,
 function storeInDatabase(db: IDBDatabase, url: string, module: WebAssemblyModule) {
     const store = db.transaction(storeName, "readwrite").objectStore(storeName);
     const baseUrl = url.split("?")[0];
-    //Clear out any previous version of this module
+    // Clear out any previous version of this module
     const baseUrlIndex = store.index("baseUrl");
     const cursorRequest = baseUrlIndex.openKeyCursor(baseUrl);
     cursorRequest.onsuccess = () => {
@@ -189,14 +197,14 @@ function storeInDatabase(db: IDBDatabase, url: string, module: WebAssemblyModule
             store.delete(cursor.primaryKey);
             cursor.continue();
         } else {
-            //Any other entries for this module deleted - now we can save this one!
-            const obj = {module: module, baseUrl: baseUrl};
+            // Any other entries for this module deleted - now we can save this one!
+            const obj = {module, baseUrl};
             const request = store.put(obj, url);
-            request.onerror = err => { console.log(`Failed to store in wasm cache: ${err}`); };
+            request.onerror = (err) => { console.log(`Failed to store in wasm cache: ${err}`); };
             request.onsuccess = () => { console.log(`Successfully stored ${url} in wasm cache`); };
         }
     }
-    cursorRequest.onerror = err => { console.log(`Failed to store in wasm cache: ${err}`); };
+    cursorRequest.onerror = (err) => { console.log(`Failed to store in wasm cache: ${err}`); };
 }
 
 interface moduleExports {
@@ -216,17 +224,17 @@ function loadAsmJs(url: string, stdlib: any, foreign: any, buffer: ArrayBuffer,
     const urlParts = url.split("/");
     const moduleFileName = urlParts[urlParts.length - 1].replace(/\./g, "");
     // first, check if the module has already been loaded
-    if (moduleFileName in window){
+    if (moduleFileName in window) {
         instantiateAsmJs(moduleFileName, buffer, callback);
     } else {
         // otherwise load it now
         const script = document.createElement("script");
         script.onerror = () => {
             callback(null);
-        }
+        };
         script.onload = () => {
             instantiateAsmJs(moduleFileName, buffer, callback);
-        }
+        };
         script.src = url;
         document.head.appendChild(script);
     }
@@ -240,12 +248,12 @@ function loadAsmJs(url: string, stdlib: any, foreign: any, buffer: ArrayBuffer,
  * @param buffer The memory allocated for your function
  * @param callback A callback function that will be called with the module exports (or null, if there was an error)
  */
-function instantiateAsmJs(moduleFileName: string, buffer: ArrayBuffer, callback: (module: moduleExports) => void){
+function instantiateAsmJs(moduleFileName: string, buffer: ArrayBuffer, callback: (module: moduleExports) => void) {
     let instance = {} as any;
     instance = window[moduleFileName]({
         TOTAL_MEMORY: buffer.byteLength,
         TOTAL_STACK: buffer.byteLength,
-        buffer: buffer,
+        buffer,
         onRuntimeInitialized: () => {
             // give it a milisecond for the object reference to set
             setTimeout(() => {
