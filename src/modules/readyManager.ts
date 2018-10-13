@@ -205,9 +205,11 @@ html5elements.forEach((element) => {
 export class ReadyManager {
     private static readonly classRegex = /(\w+)\s*?\(/g;
     private readonly readyCallbacks = [] as IAction[];
-    private isReady = false;
     private readonly loadCallbacks = [] as IAction[];
-    private isLoaded = false;
+    private readonly state = {
+        isLoaded: false,
+        isReady: false
+    };
 
     constructor() {
         this.isNowReady = this.isNowReady.bind(this);
@@ -227,6 +229,10 @@ export class ReadyManager {
                 (window as Window).attachEvent("onload", this.isNowLoaded);
             }
         }
+
+        if (Object.freeze) {
+            Object.freeze(this);
+        }
     }
 
     /**
@@ -245,7 +251,7 @@ export class ReadyManager {
     public whenReady(callback: (() => void) | IAction, fallbackAction?: () => void): void {
         const action = typeof callback === "function" ?
             this.getAction(callback, fallbackAction) : callback;
-        if (this.isReady) {
+        if (this.state.isReady) {
             this.runAction(action);
         } else {
             this.readyCallbacks.push(action);
@@ -266,7 +272,7 @@ export class ReadyManager {
     public whenLoaded(callback: (() => void) | IAction, fallbackAction?: () => void): void {
         const action = typeof callback === "function" ?
             this.getAction(callback, fallbackAction) : callback;
-        if (this.isLoaded) {
+        if (this.state.isLoaded) {
             this.runAction(action);
         } else {
             this.loadCallbacks.push(action);
@@ -343,10 +349,10 @@ export class ReadyManager {
     }
 
     private polyfillLoaded(): void {
-        if (this.isReady) {
+        if (this.state.isReady) {
             this.runCallbacks(this.readyCallbacks);
         }
-        if (this.isLoaded) {
+        if (this.state.isLoaded) {
             this.runCallbacks(this.loadCallbacks);
         }
     }
@@ -381,7 +387,7 @@ export class ReadyManager {
         if ("removeEventListener" in document) {
             document.removeEventListener("DOMContentLoaded", this.isNowReady);
         }
-        this.isReady = true;
+        this.state.isReady = true;
         this.runCallbacks(this.readyCallbacks);
     }
 
@@ -392,8 +398,8 @@ export class ReadyManager {
             (window as Window).detachEvent("onload", this.isNowLoaded);
         }
         // if we somehow missed the DOMContentLoaded event, fire isNowReady now
-        if (!this.isReady) { this.isNowReady(); }
-        this.isLoaded = true;
+        if (!this.state.isReady) { this.isNowReady(); }
+        this.state.isLoaded = true;
         this.runCallbacks(this.loadCallbacks);
     }
 

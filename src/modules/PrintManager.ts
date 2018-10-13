@@ -15,6 +15,10 @@ export class PrintManager {
             // ...but Safari doesn't support them, so we use matchMedia instead
             matchMedia("print").addListener(this.OnMediaChange);
         }
+
+        if (Object.freeze) {
+            Object.freeze(this);
+        }
     }
 
     /**
