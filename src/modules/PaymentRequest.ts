@@ -54,8 +54,8 @@ function runPaymentRequest() {
             },
             method: "POST"
         }).then((response) => {
-                // 4. Display payment results
-                if (response.status === 200) {
+            // 4. Display payment results
+            if (response.status === 200) {
                 // Payment successful
                 return result.complete("success");
             } else {
