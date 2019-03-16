@@ -88,7 +88,7 @@ gulp.task("compileNoModuleCode", gulp.series("oldModules", function() {
                 .pipe(gulp.dest("build/noModules"));
 }));
 
-gulp.task("noModuleCode", gulp.series("compileNoModuleCode", function() {
+gulp.task("noModuleCode", function() {
     const files = glob.sync('build/noModules/*.js');
     return merge(files.map(function(file) {
         return browserify({
@@ -102,7 +102,7 @@ gulp.task("noModuleCode", gulp.series("compileNoModuleCode", function() {
             .pipe(sourcemaps.write('./'))
             .pipe(gulp.dest("build/noModules"))
       }));
-}));
+});
 
 gulp.task("compileWorkerCode", function() {
     return gulp.src("src/workers/*.ts")
@@ -125,7 +125,7 @@ gulp.task("compileWorkerCode", function() {
                 .pipe(gulp.dest("build/workers"));
 });
 
-gulp.task("workerCode", gulp.series(gulp.parallel("compileWorkerCode", "compileNoModuleCode"), function() {
+gulp.task("workerCode", gulp.series("compileWorkerCode", function() {
     const files = glob.sync('build/workers/*.js');
     return merge(files.map(function(file) {
         return browserify({
@@ -182,7 +182,8 @@ gulp.task("compileBytecode", function(cb) {
     });
 });
 
-gulp.task("scripts", gulp.parallel("moduleCode", "noModuleCode", "workerCode", "polyfills"));
+gulp.task("scripts", gulp.parallel("moduleCode", "polyfills",
+    gulp.series("compileNoModuleCode", gulp.parallel("noModuleCode", "workerCode"))));
 
 const responsiveImageConfig = [{
     width: "25%",
