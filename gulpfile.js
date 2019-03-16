@@ -1,6 +1,6 @@
 "use strict";
 const gulp = require("gulp");
-const gulpMerge = require("gulp-merge");
+//const gulpMerge = require("gulp-merge");
 const postcss = require('gulp-postcss');
 const cssnano = require('cssnano');
 const uncss = require('uncss').postcssPlugin;
@@ -59,7 +59,7 @@ gulp.task("oldModules", function(){
                 .pipe(gulp.dest("build/noModules/modules"));
 });
 
-gulp.task("moduleCode", ["newModules"], function(){
+gulp.task("moduleCode", gulp.series("newModules", function(){
     return gulp.src("src/*.ts")
                 .pipe(sourcemaps.init({loadMaps: true}))
                 .pipe(ts({
@@ -72,9 +72,9 @@ gulp.task("moduleCode", ["newModules"], function(){
                 .pipe(uglify(newModuleOptions))
                 .pipe(sourcemaps.write('./'))
                 .pipe(gulp.dest("build/modules"));
-});
+}));
 
-gulp.task("compileNoModuleCode", ["oldModules"], function() {
+gulp.task("compileNoModuleCode", gulp.series("oldModules", function() {
     return gulp.src("src/*.ts")
                 .pipe(sourcemaps.init({loadMaps: true}))
                 .pipe(ts({
@@ -86,9 +86,9 @@ gulp.task("compileNoModuleCode", ["oldModules"], function() {
                 }))
                 .pipe(sourcemaps.write('./'))
                 .pipe(gulp.dest("build/noModules"));
-});
+}));
 
-gulp.task("noModuleCode", ["compileNoModuleCode"], function() {
+gulp.task("noModuleCode", gulp.series("compileNoModuleCode", function() {
     const files = glob.sync('build/noModules/*.js');
     return merge(files.map(function(file) {
         return browserify({
@@ -102,7 +102,7 @@ gulp.task("noModuleCode", ["compileNoModuleCode"], function() {
             .pipe(sourcemaps.write('./'))
             .pipe(gulp.dest("build/noModules"))
       }));
-});
+}));
 
 gulp.task("compileWorkerCode", function() {
     return gulp.src("src/workers/*.ts")
@@ -125,7 +125,7 @@ gulp.task("compileWorkerCode", function() {
                 .pipe(gulp.dest("build/workers"));
 });
 
-gulp.task("workerCode", ["compileWorkerCode", "compileNoModuleCode"], function() {
+gulp.task("workerCode", gulp.series(gulp.parallel("compileWorkerCode", "compileNoModuleCode"), function() {
     const files = glob.sync('build/workers/*.js');
     return merge(files.map(function(file) {
         return browserify({
@@ -139,7 +139,7 @@ gulp.task("workerCode", ["compileWorkerCode", "compileNoModuleCode"], function()
             .pipe(sourcemaps.write('./'))
             .pipe(gulp.dest("build/workers"))
       }));
-});
+}));
 
 //Polyfills that work with only ES3
 gulp.task("polyfillsEs3", function() {
@@ -172,7 +172,7 @@ gulp.task("polyfillsEs5", function() {
                 .pipe(gulp.dest("build/polyfills/es5"));
 });
 
-gulp.task("polyfills", ["polyfillsEs3", "polyfillsEs5"]);
+gulp.task("polyfills", gulp.parallel("polyfillsEs3", "polyfillsEs5"));
 
 gulp.task("compileBytecode", function(cb) {
     exec('cd src && make.bat', function (err, stdout, stderr) {
@@ -182,21 +182,56 @@ gulp.task("compileBytecode", function(cb) {
     });
 });
 
-gulp.task("scripts", ["moduleCode", "noModuleCode", "workerCode", "polyfills"]);
+gulp.task("scripts", gulp.parallel("moduleCode", "noModuleCode", "workerCode", "polyfills"));
 
-gulp.task("media", ["html"], function() {
-    return gulpMerge(
-        gulp.src("src/media/*{png,jpg}")
-            .pipe(imagemin([
-                imageminWebp()
-            ]))
-            .pipe(extReplace(".webp"))
-            .pipe(gulp.dest("build/media")),
-        gulp.src("src/media/*{png,jpg,gif,svg}")
-            .pipe(imagemin())
-            .pipe(gulp.dest("build/media"))
-    );
-});
+const responsiveImageConfig = [{
+    width: "25%",
+    rename: {
+        suffix: "-quarter"
+    }
+},
+{
+    width: "50%",
+    rename: {
+        suffix: "-half"
+    }
+},
+{
+    width: "75%",
+    rename: {
+        suffix: "-most"
+    }
+},
+{
+    width: "100%"
+},
+{
+    width: "25%",
+    rename: {
+        suffix: "-quarter",
+        extname: ".webp"
+    }
+},
+{
+    width: "50%",
+    rename: {
+        suffix: "-half",
+        extname: ".webp"
+    }
+},
+{
+    width: "75%",
+    rename: {
+        suffix: "-most",
+        extname: ".webp"
+    }
+},
+{
+    width: "100%",
+    rename: {
+        extname: ".webp"
+    }
+}];
 
 gulp.task("html", function() {
     const replacer = new MathMlReplacer({
@@ -214,7 +249,24 @@ gulp.task("html", function() {
                 .pipe(gulp.dest("build"));
 });
 
-gulp.task("css", ["html", "scripts"], function() {
+gulp.task("mediaWebP", function(){
+    return gulp.src("src/media/*{png,jpg}")
+        .pipe(imagemin([
+            imageminWebp()
+        ]))
+        .pipe(extReplace(".webp"))
+        .pipe(gulp.dest("build/media"));
+});
+
+gulp.task("mediaImages", function(){
+    return gulp.src("src/media/*{png,jpg,gif,svg}")
+        .pipe(imagemin())
+        .pipe(gulp.dest("build/media"));
+});
+
+gulp.task("media", gulp.series("html", gulp.parallel("mediaWebP", "mediaImages")));
+
+gulp.task("css", gulp.series(gulp.parallel("html", "scripts"), function() {
     return gulp.src("src/css/*.css")
                 .pipe(sourcemaps.init({loadMaps: true}))
                 .pipe(postcss([
@@ -225,21 +277,19 @@ gulp.task("css", ["html", "scripts"], function() {
                 ]))
                 .pipe(sourcemaps.write('./'))
                 .pipe(gulp.dest("build"));
+}));
+
+gulp.task("clean", function(cb) {
+    return del("build");
 });
 
-gulp.task("clean", function() {
-    return del.sync("build");
-});
-
-gulp.task("build", ["clean", "html", "scripts", "css", "media"]);
+gulp.task("build", gulp.series("clean", gulp.parallel("html", "scripts", "css", "media")));
 
 gulp.task("watch", function () {
-    gulp.watch('src/*.ts', ["scripts"]);
-    gulp.watch('src/*/*.ts', ["scripts"]);
-    gulp.watch('src/*/*.css', ["css"]);
-    gulp.watch('src/*/*.css', ["css"]);
-    gulp.watch('src/*/*.html', ["html"]);
-    gulp.watch('src/*/*.html', ["html"]);
+    gulp.watch('src/*.ts', gulp.series("scripts"));
+    gulp.watch('src/*/*.ts', gulp.series("scripts"));
+    gulp.watch('src/*/*.css', gulp.series("css"));
+    gulp.watch('src/*/*.html', gulp.series("html"));
 });
 
-gulp.task("default", ["build", "watch"]);
+gulp.task("default", gulp.series("build", "watch"));
