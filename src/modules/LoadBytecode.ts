@@ -104,53 +104,14 @@ interface WebAssembleTableDescriptor {
     maximum?: number;
 }
 
-const dbName = "wasm-cache";
-const storeName = "wasm-cache";
-
 /**
  * MDN-inspired code to load WebAssembly from the net only if it wasn't already cached
  * @link https://github.com/mdn/webassembly-examples/blob/master/wasm-utils.js
  */
 function loadWebAssembly(url: string, callback: (instance: WebAssemblyInstance) => void, importObject?: any): void {
-    try {
-        openDatabase((db) => {
-            if (!db) throw new Error("Unable to open database!");
-            // Now see if we already have a compiled Module with key 'url' in 'db':
-            return lookupInDatabase(db, url, (module) => {
-                if (module) {
-                    // We do! Instantiate it with the given import object.
-                    (WebAssembly.instantiate(module, importObject) as Promise<WebAssemblyInstance>)
-                        .then(callback);
-                } else {
-                    // Nope! Compile from scratch and then store the compiled Module in 'db'
-                    // with key 'url' for next time.
-                    return fetchWebassembly(url, importObject).then((results) => {
-                        storeInDatabase(db, url, results.module);
-                        callback(results.instance);
-                    });
-                }
-            });
-        });
-    } catch (e) {
-        // If opening the database failed (due to permissions or quota), fall back
-        // to simply fetching and compiling the module and don't try to store the
-        // results.
-        console.error(e);
-        fetchWebassembly(url, importObject).then((results) => {
-            callback(results.instance);
-        });
-    }
-}
-
-function openDatabase(callback: (database: IDBDatabase) => void): void {
-    const request = indexedDB.open(dbName, 1);
-    request.onerror = () => { callback(null); };
-    request.onsuccess = () => { callback(request.result); };
-    request.onupgradeneeded = () => {
-        const db = request.result as IDBDatabase;
-        const store = db.createObjectStore(storeName);
-        store.createIndex("baseUrl", "baseUrl", {unique: false});
-    };
+    fetchWebassembly(url, importObject).then((results) => {
+        callback(results.instance);
+    });
 }
 
 function fetchWebassembly(url: string, importObject?: any): Promise<WebAssemblyResult> {
@@ -159,52 +120,12 @@ function fetchWebassembly(url: string, importObject?: any): Promise<WebAssemblyR
     if ("instantiateStreaming" in WebAssembly) {
         return WebAssembly.instantiateStreaming(fetchedBytes, importObject);
     } else {
-        return fetchedBytes.then(response =>
+        return fetchedBytes.then((response) =>
             response.arrayBuffer()
         ).then((bytes) =>
             WebAssembly.instantiate(bytes, importObject) as Promise<WebAssemblyResult>
         );
     }
-}
-
-/**
- * Checks the database to see if we have loaded this module before
- */
-function lookupInDatabase(db: IDBDatabase, url: string,
-                          callback: (module: WebAssemblyModule) => void): void {
-    const store = db.transaction([storeName]).objectStore(storeName);
-    const request = store.get(url);
-    request.onerror = () => { callback(null); };
-    request.onsuccess = () => {
-        if (request.result && request.result.module)
-            callback(request.result.module);
-        else
-            callback(null);
-    }
-}
-
-// This helper function fires off an async operation to store the given wasm
-// Module in the given IDBDatabase.
-function storeInDatabase(db: IDBDatabase, url: string, module: WebAssemblyModule) {
-    const store = db.transaction(storeName, "readwrite").objectStore(storeName);
-    const baseUrl = url.split("?")[0];
-    // Clear out any previous version of this module
-    const baseUrlIndex = store.index("baseUrl");
-    const cursorRequest = baseUrlIndex.openKeyCursor(baseUrl);
-    cursorRequest.onsuccess = () => {
-        const cursor = cursorRequest.result as IDBCursor;
-        if (cursor) {
-            store.delete(cursor.primaryKey);
-            cursor.continue();
-        } else {
-            // Any other entries for this module deleted - now we can save this one!
-            const obj = {module, baseUrl};
-            const request = store.put(obj, url);
-            request.onerror = (err) => { console.log(`Failed to store in wasm cache: ${err}`); };
-            request.onsuccess = () => { console.log(`Successfully stored ${url} in wasm cache`); };
-        }
-    }
-    cursorRequest.onerror = (err) => { console.log(`Failed to store in wasm cache: ${err}`); };
 }
 
 interface moduleExports {
