@@ -44,7 +44,10 @@
             <section id="3">
                 <h2>Lazy load</h2>
                 <!--[if (gt IE 8)|!(IE)]><!--><noscript data-lazy-load><!--<![endif]-->
-                    <img src="/media/you-have-gone-back-in-time.jpg" width="480" height="300"/>
+                    <picture>
+                        <source type="image/webp" srcset="/media/you-have-gone-back-in-time.webp" />
+                        <img src="/media/you-have-gone-back-in-time.jpg" width="480" height="300"/>
+                    </picture>
                 <!--[if (gt IE 8)|!(IE)]><!--></noscript><!--<![endif]-->
             </section>
         </main>
