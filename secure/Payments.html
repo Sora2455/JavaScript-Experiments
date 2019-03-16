@@ -2,8 +2,8 @@
 <html lang="en-AU" dir="ltr">
     <head>
         <meta charset="utf-8" />
-        <title>JavaScript experiments demo</title>
-        <!--[if lte IE 8]><link rel="stylesheet" href="ie8.css" /><![endif]-->
+        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; form-action 'self';">
+        <title>Payment screen</title>
         <style>
             html {
                 box-sizing: border-box;
@@ -16,7 +16,7 @@
             }
 
             body {
-                font-family: sans-serif;
+                font-family: system-ui, -apple-system, sans-serif;
                 margin: 40px;
             }
 
@@ -68,26 +68,29 @@
         <form method="POST">
             <label>
                 <p>Name on the card</p>        
-                <input id="ccname" name="ccname" required autofocus autocomplete="cc-name" />
+                <input name="ccname" required autofocus autocomplete="cc-name" />
             </label>
         
             <label>
                 <p>Credit card number</p>
-                <input id="cardnumber" name="cardnumber" required pattern="[0-9]{12,19}" autocomplete="cc-number" />
+                <input ame="cardnumber" required pattern="[0-9]{12,19}" autocomplete="cc-number"
+                title="A 12 to 19 digit number" />
             </label>
         
             <label>
                 <p>CVC</p>
-                <input id="cvc" name="cvc" required pattern="[0-9]{3,4}" autocomplete="cc-csc" />
+                <input name="cvc" required pattern="[0-9]{3,4}" autocomplete="cc-csc"
+                title="A 3 to 4 digit number" />
             </label>
         
             <label>
                 <p>Expiry date</p>
-                <input id="cc-exp" name="cc-exp" placeholder="mm/yyyy" required pattern="[0-1][0-9]/20[1-2][0-9]"
-                    title="Two digit month, forward slash, four digit year between 2010 and 2029" autocomplete="cc-exp" />
+                <input name="cc-exp" placeholder="yyyy-mm" required pattern="20[1-2][0-9]-[0-1][0-9]"
+                    title="Four digit year between 2010 and 2029, dash, two digit month" autocomplete="cc-exp"
+                    type="month" min="2018-10" />
             </label>
         
-            <button id="submit">Submit</button>
+            <button>Submit</button>
         </form>
     </body>
 </html>
