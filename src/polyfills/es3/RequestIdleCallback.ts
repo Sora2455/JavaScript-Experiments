@@ -13,7 +13,7 @@
  * or implied. See the License for the specific language governing
  * permissions and limitations under the License.
  */
- 
+
 /*
  * @see https://developers.google.com/web/updates/2015/08/using-requestidlecallback
  */
@@ -25,6 +25,7 @@ interface IRequestIdleCallbackDeadline {
     readonly didTimeout: boolean;
     timeRemaining: (() => number);
 }
+// tslint:disable-next-line:interface-name
 interface Window {
     requestIdleCallback: ((
         callback: ((deadline: IRequestIdleCallbackDeadline) => void),
@@ -33,19 +34,19 @@ interface Window {
     cancelIdleCallback: ((handle: RequestIdleCallbackHandle) => void);
 }
 window.requestIdleCallback = window.requestIdleCallback ||
-    function (cb) {
-        return setTimeout(function () {
-            var start = Date.now();
-            cb({ 
+    ((cb: ((deadline: IRequestIdleCallbackDeadline) => void)) => {
+        return window.setTimeout(() => {
+            const start = Date.now();
+            cb({
                 didTimeout: false,
-                timeRemaining: function () {
+                timeRemaining() {
                     return Math.max(0, 50 - (Date.now() - start));
                 }
-            });
+            } as IRequestIdleCallbackDeadline);
         }, 1);
-    }
+    });
 
 window.cancelIdleCallback = window.cancelIdleCallback ||
-    function (id) {
-        clearTimeout(id);
-    }
+    ((id) => {
+        window.clearTimeout(id);
+    });
