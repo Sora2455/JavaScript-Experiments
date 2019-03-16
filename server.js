@@ -31,10 +31,10 @@ function setHeaders(res, path){
             "ambient-light-sensor 'none'; camera 'none'; gyroscope 'none'; magnetometer 'none'; " +
             "microphone 'none'; fullscreen 'none';");
         res.setHeader("X-Frame-Options", "sameorigin");
-        res.setHeader("X-Content-Type-Options", "nosniff");
         res.setHeader("X-UA-Compatible", `IE=${ieVersion}`);
-        res.setHeader("TK", "N");
     }
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    res.setHeader("TK", "N");
     addMimeTypes(res, path);
 }
 
