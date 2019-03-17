@@ -84,6 +84,10 @@ export const Requirement: IFeatureList = {
     requestIdleCallback: {
         polyfillSrc: "/polyfills/es3/RequestIdleCallback.js",
         test: () => typeof requestIdleCallback === "function"
+    },
+    sendBeacon: {
+        polyfillSrc: "/polyfills/es3/SendBeacon.js",
+        test: () => !navigator.sendBeacon
     }
 };
 Requirement.BroadcastChannel.polyfillRequires = [Requirement.MessageChannel];
