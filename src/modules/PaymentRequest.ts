@@ -67,7 +67,5 @@ function runPaymentRequest() {
         }, () => {
             return result.complete("fail");
         });
-    }, (reason) => {
-        console.log(reason);
-    });
+    }, runFallbackPaymentRequest);
 }
