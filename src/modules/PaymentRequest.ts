@@ -1,3 +1,5 @@
+import {authorCurrency as currency} from "./Localiser.js";
+
 export function onBuyClicked() {
     if (typeof PaymentRequest !== "function") {
         runFallbackPaymentRequest();
@@ -26,14 +28,14 @@ function runPaymentRequest() {
     // Checkout details
     const details = {
         displayItems: [{
-            amount: { currency: "AUD", value: "65.00" },
+            amount: { currency, value: "65.00" },
             label: "Original donation amount"
         }, {
-            amount: { currency: "AUD", value: "-10.00" },
+            amount: { currency, value: "-10.00" },
             label: "Friends and family discount"
         }],
         total: {
-            amount: { currency: "AUD", value : "55.00" },
+            amount: { currency, value : "55.00" },
             label: "Total due"
         }
     } as PaymentDetailsInit;
