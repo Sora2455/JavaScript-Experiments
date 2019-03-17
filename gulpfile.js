@@ -269,7 +269,7 @@ gulp.task("mediaImages", function(){
         .pipe(gulp.dest("build/media"));
 });
 
-gulp.task("media", gulp.series("html", gulp.parallel("mediaWebP", "mediaImages")));
+gulp.task("media", gulp.parallel("mediaWebP", "mediaImages"));
 
 // Generate the icons. This task takes a few seconds to complete.
 // You should run it at least once to create the icons. Then,
@@ -353,7 +353,7 @@ gulp.task('check-for-favicon-update', function(done) {
 	});
 });
 
-gulp.task("css", gulp.series(gulp.parallel("html", "scripts"), function() {
+gulp.task("css", function() {
     return gulp.src("src/css/*.css")
                 .pipe(sourcemaps.init({loadMaps: true}))
                 .pipe(postcss([
@@ -364,13 +364,33 @@ gulp.task("css", gulp.series(gulp.parallel("html", "scripts"), function() {
                 ]))
                 .pipe(sourcemaps.write('./'))
                 .pipe(gulp.dest("build"));
-}));
+});
 
-gulp.task("clean", function(cb) {
+gulp.task("cleanModules", function() {
+    return del("build/modules");
+});
+
+gulp.task("cleanNoModules", function() {
+    return del("build/noModules");
+});
+
+gulp.task("cleanPolyfills", function() {
+    return del("build/polyfills");
+});
+
+gulp.task("cleanWorkers", function() {
+    return del("build/workers");
+});
+
+gulp.task("cleanScripts", gulp.parallel("cleanModules", "cleanNoModules", "cleanPolyfills", "cleanWorkers"));
+
+gulp.task("fullClean", function() {
     return del("build");
 });
 
-gulp.task("build", gulp.series("clean", gulp.parallel("html", "scripts", "css", "media")));
+gulp.task("build", gulp.series("cleanScripts", gulp.parallel("html", "scripts"), "css"));
+
+gulp.task("fullBuild", gulp.series("fullClean", gulp.parallel("scripts", gulp.series("generate-favicon", "html", "media")), "css"));
 
 gulp.task("watch", function () {
     gulp.watch('src/*.ts', gulp.series("scripts"));
