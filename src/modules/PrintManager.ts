@@ -16,8 +16,8 @@ export class PrintManager {
                 addEventListener("afterprint", this.OnPrintEnd);
             // startpolyfill (compiler directive)
             } else {
-                onbeforeprint = this.OnPrintBegin;
-                onafterprint = this.OnPrintEnd;
+                window.attachEvent("onbeforeprint", this.OnPrintBegin);
+                window.attachEvent("onafterprint", this.OnPrintEnd);
             }
             // endpolyfill
         } else {
