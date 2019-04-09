@@ -29,7 +29,8 @@ function setHeaders(res, path){
             "sync-script 'none'; image-compression 'none'; legacy-image-formats 'none'; " +
             "max-downscaling-image 'none'; unsized-media 'none'; accelerometer 'none'; " +
             "ambient-light-sensor 'none'; camera 'none'; gyroscope 'none'; magnetometer 'none'; " +
-            "microphone 'none'; fullscreen 'none';");
+            "microphone 'none'; fullscreen 'none'; encrypted-media 'none'; document-domain 'none';" +
+            "autoplay 'self'; geolocation 'none'; payment 'self'; vr 'none';");
         res.setHeader("X-Frame-Options", "sameorigin");
         res.setHeader("X-UA-Compatible", `IE=${ieVersion}`);
     }
@@ -71,7 +72,7 @@ function return1x1pxPng(res) {
 }
 
 function setNoCache(res) {
-    res.setHeader('Cache-Control', 'no-store, must-revalidate');
+    res.setHeader('Cache-Control', 'no-store, private, must-revalidate');
 }
 
 function drawQrCode(res, codeString) {
