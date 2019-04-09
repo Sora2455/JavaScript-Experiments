@@ -56,25 +56,26 @@ function jamSourceLoading(lazyItem: HTMLPictureElement, tempData: string): void 
  * but will once the user is close to seeing them
  */
 function prepareLazyContents(lazyArea: HTMLDivElement): void {
-    const nativeLazyLoad = (() => {
-        const img = document.createElement("img");
-        return "lazyload" in img;
-    })();
+    const nativeLazyLoad = "loading" in HTMLImageElement.prototype;
     const lazyImgs = lazyArea.getElementsByTagName("img");
     for (let i = lazyImgs.length; i--;) {
         if (nativeLazyLoad) {
-            lazyImgs[i].setAttribute("lazyload", "on");
+            lazyImgs[i].setAttribute("loading", "lazy");
         } else {
             storeSourceForLater(lazyImgs[i], tempImg);
         }
     }
     const lazyiFrames = lazyArea.getElementsByTagName("iframe");
     for (let i2 = lazyiFrames.length; i2--;) {
-        storeSourceForLater(lazyiFrames[i2], "about:blank");
+        if (nativeLazyLoad) {
+            lazyiFrames[i2].setAttribute("loading", "lazy");
+        } else {
+            storeSourceForLater(lazyiFrames[i2], "about:blank");
+        }
     }
-    const lazyPictures = lazyArea.getElementsByTagName("picture");
-    for (let i3 = lazyPictures.length; i3--;) {
-        if (!nativeLazyLoad) {
+    if (!nativeLazyLoad) {
+        const lazyPictures = lazyArea.getElementsByTagName("picture");
+        for (let i3 = lazyPictures.length; i3--;) {
             jamSourceLoading(lazyPictures[i3], tempImg);
         }
     }
