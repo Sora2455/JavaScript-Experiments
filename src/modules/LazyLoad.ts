@@ -55,9 +55,9 @@ function jamSourceLoading(lazyItem: HTMLPictureElement, tempData: string): void 
  * Set up the lazy items so that they won't try to load when we add them to the document,
  * but will once the user is close to seeing them
  */
-function prepareLazyContents(lazyArea: HTMLDivElement): void {
+function prepareLazyContents(lazyArea: DocumentFragment): void {
     const nativeLazyLoad = "loading" in HTMLImageElement.prototype;
-    const lazyImgs = lazyArea.getElementsByTagName("img");
+    const lazyImgs = lazyArea.querySelectorAll("img");
     for (let i = lazyImgs.length; i--;) {
         if (nativeLazyLoad) {
             lazyImgs[i].setAttribute("loading", "lazy");
@@ -65,7 +65,7 @@ function prepareLazyContents(lazyArea: HTMLDivElement): void {
             storeSourceForLater(lazyImgs[i], tempImg);
         }
     }
-    const lazyiFrames = lazyArea.getElementsByTagName("iframe");
+    const lazyiFrames = lazyArea.querySelectorAll("iframe");
     for (let i2 = lazyiFrames.length; i2--;) {
         if (nativeLazyLoad) {
             lazyiFrames[i2].setAttribute("loading", "lazy");
@@ -74,16 +74,16 @@ function prepareLazyContents(lazyArea: HTMLDivElement): void {
         }
     }
     if (!nativeLazyLoad) {
-        const lazyPictures = lazyArea.getElementsByTagName("picture");
+        const lazyPictures = lazyArea.querySelectorAll("picture");
         for (let i3 = lazyPictures.length; i3--;) {
             jamSourceLoading(lazyPictures[i3], tempImg);
         }
     }
-    const lazyAudios = lazyArea.getElementsByTagName("audio");
+    const lazyAudios = lazyArea.querySelectorAll("audio");
     for (let i4 = lazyAudios.length; i4--;) {
         lazyAudios[i4].preload = "none";
     }
-    const lazyVideos = lazyArea.getElementsByTagName("video");
+    const lazyVideos = lazyArea.querySelectorAll("video");
     for (let i5 = lazyVideos.length; i5--;) {
         const lazyVideo = lazyVideos[i5];
         lazyVideo.preload = "none";
@@ -141,9 +141,20 @@ function setUp(): void {
         if (!noScriptTag.hasAttribute("data-lazy-load")) { continue; }
         // The contents of a noscript tag are treated as text to JavaScript
         const lazyAreaHtml = noScriptTag.textContent || noScriptTag.innerHTML;
-        // So we stick them in the innerHTML of a new div tag to 'load' them
-        const lazyArea = document.createElement("div");
-        lazyArea.innerHTML = lazyAreaHtml;
+        let lazyArea: DocumentFragment;
+        try {
+            // Use createContextualFragment where supported,
+            // as it won't execute network requests until we attach it to the DOM
+            lazyArea = document.createRange().createContextualFragment(lazyAreaHtml);
+        } catch (e) {
+            // Browsers that don't support the above, we stick the string in the innerHTML of a new div tag to 'load' it
+            const lazyDiv = document.createElement("div");
+            lazyDiv.innerHTML = lazyAreaHtml;
+            lazyArea = document.createDocumentFragment();
+            for (let i1 = lazyArea.childNodes.length; i1--;) {
+                lazyArea.appendChild(lazyArea.childNodes[i1]);
+            }
+        }
         // only delay loading if we can use the IntersectionObserver to check for visibility
         if (!observer) {
             noScriptTag.parentNode.replaceChild(lazyArea, noScriptTag);
