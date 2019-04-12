@@ -111,6 +111,7 @@ new ReadyManager().whenReady(() => {
             const qrCode = ev.data as IQRCodeModel;
             drawer.draw(qrCode);
         };
+        let lastQrValue = QRCodeInput.value;
         if (QRCodeInput.value) {
             QRCodeResult.title = QRCodeInput.value;
             QRCodeResult.setAttribute("aria-label", `The QR Code for the value '${QRCodeInput.value}'`);
@@ -119,6 +120,9 @@ new ReadyManager().whenReady(() => {
             QRCodeResult.setAttribute("aria-label", "A blank QR Code");
         }
         const onChange = () => {
+            // Don't do anything if the value hasn't changed
+            if (QRCodeInput.value === lastQrValue) { return; }
+            lastQrValue = QRCodeInput.value;
             if (QRCodeInput.value) {
                 QRCodeResult.title = QRCodeInput.value;
                 QRCodeResult.setAttribute("aria-label", `The QR Code for the value '${QRCodeInput.value}'`);
