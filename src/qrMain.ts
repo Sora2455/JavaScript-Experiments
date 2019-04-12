@@ -18,7 +18,7 @@ function getRootElementFontSize(): number {
     );
 }
 
-interface IhtOption {
+interface IHtOption {
     [key: string]: string | number | boolean | QRErrorCorrectLevel; // index defintion
     text?: string;
     colorLight: string;
@@ -48,9 +48,9 @@ class TableDrawer {
         return model.modules[row][col];
     }
     private el: HTMLElement;
-    private htOption: IhtOption;
+    private htOption: IHtOption;
 
-    constructor(el: HTMLElement, htOption: IhtOption) {
+    constructor(el: HTMLElement, htOption: IHtOption) {
         this.el = el;
         this.htOption = htOption;
     }
@@ -103,7 +103,7 @@ new ReadyManager().whenReady(() => {
             colorLight: "#ffffff",
             correctLevel: QRErrorCorrectLevel.H,
             typeNumber: 4
-        } as IhtOption;
+        } as IHtOption;
         const drawer = new TableDrawer(QRCodeResult, htOption);
         const qrCodeWorker = new Worker("workers/QRCodeRenderer.min.js");
         qrCodeWorker.onmessage = (ev) => {
