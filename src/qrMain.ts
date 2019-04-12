@@ -70,6 +70,7 @@ class TableDrawer {
         table.style.borderCollapse = "collapse";
         table.style.tableLayout = "fixed";
         table.style.width = table.style.height = "100%";
+        table.setAttribute("aria-hidden", "true");
 
         for (let row = 0; row < nCount; row++) {
             const rowEl = document.createElement("tr");
@@ -112,13 +113,19 @@ new ReadyManager().whenReady(() => {
         };
         if (QRCodeInput.value) {
             QRCodeResult.title = QRCodeInput.value;
+            QRCodeResult.setAttribute("aria-label", `The QR Code for the value '${QRCodeInput.value}'`);
             qrCodeWorker.postMessage([QRCodeInput.value, htOption]);
+        } else {
+            QRCodeResult.setAttribute("aria-label", "A blank QR Code");
         }
         const onChange = () => {
             if (QRCodeInput.value) {
                 QRCodeResult.title = QRCodeInput.value;
+                QRCodeResult.setAttribute("aria-label", `The QR Code for the value '${QRCodeInput.value}'`);
                 qrCodeWorker.postMessage([QRCodeInput.value, htOption]);
             } else {
+                QRCodeResult.title = "";
+                QRCodeResult.setAttribute("aria-label", "A blank QR Code");
                 drawer.clear();
             }
         };
@@ -129,6 +136,8 @@ new ReadyManager().whenReady(() => {
         };
         const twentyRem = (20 * getRootElementFontSize()).toString() + "px";
         QRCodeResult.style.width = QRCodeResult.style.height = twentyRem;
+        // let screen readers know this is an image
+        QRCodeResult.setAttribute("role", "img");
 
         // hide the generate button
         document.getElementById("QRCodeGenerate").style.display = "none";
