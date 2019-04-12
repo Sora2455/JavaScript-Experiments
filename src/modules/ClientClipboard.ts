@@ -6,19 +6,9 @@ declare global {
          */
         clipboardData: IClipboardData;
     }
-    // tslint:disable-next-line:interface-name
-    interface Navigator {
-        /**
-         * A new promise-based API for accessing the user's clipboard
-         */
-        clipboard: IClipboardApi;
-    }
 }
 interface IClipboardData {
     setData: (type: string, value: any) => void;
-}
-interface IClipboardApi {
-    writeText: (text: string) => Promise<void>;
 }
 
 /**Copy text into the user's cliplboard
