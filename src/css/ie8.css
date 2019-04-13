@@ -28,6 +28,21 @@ h6 {
     font-size: 11px;
 }
 
+nav {
+    height: 64px;
+}
+
+main {
+    top: 80px;
+    max-height: 640px;
+    height: 640px;
+}
+
+main section {
+    max-height: 640px;
+    height: 640px;
+}
+
 .warningMessagePopup {
     font-size: 2em;
 }
