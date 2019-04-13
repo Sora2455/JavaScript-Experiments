@@ -10,7 +10,6 @@ html,
 body {
     height: 100%;
     margin: 0;
-    font-size: 16px;
     font-size: 1rem; /* stylelint-disable-line */
     box-sizing: border-box;
     cursor: default; /* 1 */
@@ -56,33 +55,27 @@ hr {
 
 /* Switch to using rem units for typography. Fix line-height on headlines. */
 h1 {
-    font-size: 32px;
     font-size: 2rem; /* Make all H1 large, remove nested-shrinking sizes. */ /* stylelint-disable-line */
     margin: 0.67em 0;
 }
 
 h2 {
-    font-size: 24px;
     font-size: 1.5rem; /* stylelint-disable-line */
 }
 
 h3 {
-    font-size: 19px;
     font-size: 1.17rem; /* stylelint-disable-line */
 }
 
 h4 {
-    font-size: 16px;
     font-size: 1rem; /* stylelint-disable-line */
 }
 
 h5 {
-    font-size: 13px;
     font-size: 0.83rem; /* stylelint-disable-line */
 }
 
 h6 {
-    font-size: 11px;
     font-size: 0.67rem; /* stylelint-disable-line */
 }
 
@@ -356,7 +349,6 @@ table {
     background-color: #ffbaba;
     color: #d8000c;
     padding: 0 0.5em;
-    font-size: 2em;
     font-size: 2rem; /* stylelint-disable-line */
     z-index: 1;
 }
