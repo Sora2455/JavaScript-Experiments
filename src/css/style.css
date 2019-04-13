@@ -280,23 +280,6 @@ small {
 }
 
 /*
- * Remove the text shadow on text selections in Firefox 61- (opinionated).
- * 1. Restore the coloring undone by defining the text shadow
- *    in all browsers (opinionated).
- */
-::-moz-selection {
-    background-color: #b3d4fc; /* 1 */
-    color: #000; /* 1 */
-    text-shadow: none; /* stylelint-disable-line */
-}
-
-::selection {
-    background-color: #b3d4fc; /* 1 */
-    color: #000; /* 1 */
-    text-shadow: none; /* stylelint-disable-line */
-}
-
-/*
  * Change the display on media elements in all browsers (opinionated).
  */
 audio,
@@ -334,21 +317,6 @@ table {
 ::-webkit-input-placeholder {
     color: inherit;
     opacity: 0.54; /* stylelint-disable-line */
-}
-
-/**
- * Remove the inner border and padding of focus outlines in Firefox.
- */
-::-moz-focus-inner {
-    border-style: none;
-    padding: 0;
-}
-
-/**
- * Restore the focus outline styles unset by the previous rule in Firefox.
- */
-:-moz-focusring {
-    outline: 1px dotted ButtonText; /* stylelint-disable-line */
 }
 
 /*
