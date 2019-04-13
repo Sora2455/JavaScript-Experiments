@@ -65,7 +65,7 @@ describe("Cross-browser testing", async function() {
             });
 
             it("Can access the test site", async function() {
-                await driver.get(siteUrl);
+                await driver.get(`${siteUrl}#1`);
                 await driver.manage().window().maximize();
                 await driver.switchTo().frame(0);
                 if (browser !== "noscript") {
