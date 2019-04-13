@@ -132,7 +132,6 @@ nav {
     display: table;
     table-layout: fixed;
     background-color: #000;
-    height: 64px;
     height: 4rem; /* stylelint-disable-line */
     width: 100%;
     padding: 0 8px;
@@ -163,29 +162,33 @@ nav a {
 
 main {
     position: absolute;
-    top: 80px;
-    top: 5rem; /* stylelint-disable-line */
-    max-height: 640px;
-    max-height: 40rem; /* stylelint-disable-line */
-    height: 640px;
-    height: calc(100vh - 5rem); /* stylelint-disable-line */
+    top: 4rem; /* stylelint-disable-line */
     width: 100%;
     padding: 0 8px;
-    overflow-y: hidden;
-    scroll-behavior: smooth;
 }
 
 main section {
-    max-height: 640px;
-    max-height: 40rem; /* stylelint-disable-line */
-    height: 640px;
-    height: calc(100vh - 5rem); /* stylelint-disable-line */
+    height: 1px;
     width: 100%;
     overflow: auto;
 }
 
+/* Show the targeted section */
+main section:target { /* stylelint-disable-line */
+    height: calc(100vh - 4rem); /* stylelint-disable-line */
+}
+
+/* Show the last section by default... */
+main section:last-of-type { /* stylelint-disable-line */
+    height: calc(100vh - 4rem); /* stylelint-disable-line */
+}
+
+/* But hide it once another one is selected */
+main section:target ~ section { /* stylelint-disable-line */
+    height: 1px;
+}
+
 main section iframe.section {
-    height: 99%;
     height: calc(100% - 4px); /* stylelint-disable-line */
     width: 100%;
     margin: 0;

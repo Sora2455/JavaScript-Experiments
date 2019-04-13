@@ -34,13 +34,14 @@ nav {
 
 main {
     top: 80px;
-    max-height: 640px;
-    height: 640px;
 }
 
 main section {
-    max-height: 640px;
-    height: 640px;
+    height: 640px !important;
+}
+
+section iframe.section {
+    height: 99%;
 }
 
 .warningMessagePopup {
