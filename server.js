@@ -1,3 +1,6 @@
+"use strict";
+const fs = require('fs');
+const path = require('path');
 const fastify = require('fastify');
 const compression = require('fastify-compress');
 const serveStatic = require('fastify-static');
@@ -6,7 +9,13 @@ const qrCode = require("./build/noModules/modules/QRCodeRenderer");
 
 let ieVersion = "edge";
 
-const server = fastify();
+const server = fastify({
+    http2: true,
+    https: {
+        pfx: fs.readFileSync(path.join(__dirname, 'https', 'testingCert.pfx')),
+        passphrase: "testingCert"
+    }
+});
 // gzip/deflate outgoing responses
 server.register(compression);
 // serve dynamic images
