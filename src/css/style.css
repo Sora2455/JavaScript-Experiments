@@ -168,7 +168,7 @@ main {
 }
 
 main section {
-    height: 1px;
+    height: 0;
     width: 100%;
     overflow: auto;
 }
@@ -185,7 +185,7 @@ main section:last-of-type { /* stylelint-disable-line */
 
 /* But hide it once another one is selected */
 main section:target ~ section { /* stylelint-disable-line */
-    height: 1px;
+    height: 0;
 }
 
 main section iframe.section {
