@@ -1,26 +1,35 @@
-const connect = require('connect');
-const compression = require('compression');
-const serveStatic = require('serve-static');
+const fastify = require('fastify');
+const compression = require('fastify-compress');
+const serveStatic = require('fastify-static');
 const Canvas = require('canvas');
 const qrCode = require("./build/noModules/modules/QRCodeRenderer");
 
 let ieVersion = "edge";
 
-const server = connect()
+const server = fastify();
 // gzip/deflate outgoing responses
-.use(compression())
+server.register(compression);
 // serve dynamic images
-.use(handleDynamicImages)
+server.get("/qrCode.png", handleDynamicImages);
 // serve static files
-.use(serveStatic(__dirname + "/build", {
-    maxAge: 1000 * 60 * 60 * 24,
+server.register(serveStatic,
+{
+    root: __dirname + "/build",
+    maxAge: 1000 * 60 * 60 * 24,//Cache for a day at least
     immutable: true,
-    setHeaders: setHeaders
-})).listen(8080, function(){
-    console.log('Server running on 8080...');
+    setHeaders: setHeaders,
+    lastModified: false,//The last modified header causes browsers to check for updates even with immutable specified
+    etag: false//Ditto for eTag
+});
+server.listen(8080, function (err, address) {
+    if (err) {
+        console.error(err);
+        process.exit(1);
+    }
+    console.log(`Server running on ${address}...`);
 });
 
-function setHeaders(res, path){
+function setHeaders(res, path, stat){
     if (path.endsWith(".html")) {
         res.setHeader("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; " +
             "base-uri 'none'; form-action 'self'; frame-ancestors 'self'");
@@ -45,37 +54,30 @@ function addMimeTypes(res, path){
     }
 }
 
-function handleDynamicImages (req, res, next) {
-    // req is the Node.js http request object
-    // res is the Node.js http response object
-    // next is a function to call to invoke the next middleware
-    if (req.url === "/qrCode.png") {
-        res.setHeader('Vary', 'referer');
-        res.setHeader('content-type', 'image/png');
+function handleDynamicImages (req, reply) {
+    reply.header('Vary', 'referer');
+    reply.type('image/png');
 
-        const referrerGetParamaters = readGetParamaters(req.headers["referer"]);
-        const qrCode = referrerGetParamaters["QRCode"];
-        if (!qrCode) {
-            return1x1pxPng(res);
-        } else {
-            drawQrCode(res, qrCode);
-        }
+    const referrerGetParamaters = readGetParamaters(req.headers["referer"]);
+    const qrCode = referrerGetParamaters["QRCode"];
+    if (!qrCode) {
+        return1x1pxPng(reply);
     } else {
-        next();
+        drawQrCode(reply, qrCode);
     }
 }
 
-function return1x1pxPng(res) {
+function return1x1pxPng(reply) {
     const image = new Canvas(1, 1);
     const stream = image.pngStream();
-    stream.pipe(res);
+    reply.send(stream);
 }
 
 function setNoCache(res) {
     res.setHeader('Cache-Control', 'no-store, private, must-revalidate');
 }
 
-function drawQrCode(res, codeString) {
+function drawQrCode(reply, codeString) {
     const model = new qrCode.QRCodeModel(qrCode._getTypeNumber(codeString, 2), 2);
     model.addData(codeString);
     model.make();
@@ -98,7 +100,7 @@ function drawQrCode(res, codeString) {
     }
 
     const stream = image.pngStream();
-    stream.pipe(res);
+    reply.send(stream);
 }
 
 function readGetParamaters(url) {
