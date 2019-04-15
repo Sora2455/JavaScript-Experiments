@@ -61,6 +61,10 @@ main section[data-print-subject] {
     height: auto !important;
 }
 
+main section:last-of-type { /* stylelint-disable-line */
+    height: 0 !important;
+}
+
 .warningMessagePopup {
     display: none;
 }
