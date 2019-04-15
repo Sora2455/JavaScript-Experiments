@@ -329,6 +329,7 @@ table {
  */
 [aria-hidden="false"][hidden]:not(:focus) { /* stylelint-disable-line */
     clip: rect(0, 0, 0, 0);
+    clip-path: polygon(0 0, 0 0, 0 0, 0 0); /* stylelint-disable-line */
     display: inherit;
     position: absolute;
 }
