@@ -276,6 +276,12 @@ gulp.task("media", gulp.parallel("mediaWebP", "mediaImages"));
 // you should run it whenever RealFaviconGenerator updates its
 // package (see the check-for-favicon-update task below).
 gulp.task('generate-favicon', function(done) {
+    //If we've already set up the favicon, skip this step
+    if (fs.existsSync("build/favicon.ico")) {
+        done();
+        return;
+    }
+
 	realFavicon.generateFavicon({
 		masterPicture: 'src/favicon/favicon.svg',
 		dest: 'build',
@@ -335,9 +341,7 @@ gulp.task('generate-favicon', function(done) {
 			usePathAsIs: false
 		},
 		markupFile: FAVICON_DATA_FILE
-	}, function() {
-		done();
-	});
+	}, done);
 });
 
 // Check for updates on RealFaviconGenerator (think: Apple has just
