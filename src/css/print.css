@@ -56,13 +56,9 @@ main {
     top: 0;
 }
 
-body main section {
-    display: none;
-}
-
 /* uncss:ignore */
-body main section[data-print-subject] {
-    display: block;
+main section[data-print-subject] {
+    height: auto !important;
 }
 
 .warningMessagePopup {
