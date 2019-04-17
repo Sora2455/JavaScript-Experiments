@@ -1,5 +1,5 @@
 /* stylelint-disable */
-*,
+*:not(#QRCodeResult td),
 *::before,
 *::after {
     /* stylelint-enable */
@@ -67,4 +67,10 @@ main section:last-of-type { /* stylelint-disable-line */
 
 .warningMessagePopup {
     display: none;
+}
+
+/* uncss:ignore */
+#QRCodeResult td {
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
 }
