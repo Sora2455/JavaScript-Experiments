@@ -65,6 +65,10 @@ main section:last-of-type { /* stylelint-disable-line */
     height: 0 !important;
 }
 
+main section iframe.section {
+    height: 27rem; /* stylelint-disable-line */
+}
+
 .warningMessagePopup {
     display: none;
 }
