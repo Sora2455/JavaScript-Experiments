@@ -38,7 +38,6 @@
     "edgedriver": "^4.17134.1",
     "fluent-ffmpeg": "^2.1.2",
     "geckodriver": "^1.16.2",
-    "gulp-fluent-ffmpeg": "^1.0.2",
     "gulp-real-favicon": "^0.3.2",
     "iedriver": "^3.14.1",
     "mocha": "^5.2.0",
