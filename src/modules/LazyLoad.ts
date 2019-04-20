@@ -1,4 +1,44 @@
 import {ReadyManager} from "./readyManager.js";
+
+interface INetworkInformation {
+    /**
+     * Returns the effective bandwidth estimate in megabits per second,
+     * rounded to the nearest multiple of 25 kilobits per seconds.
+     */
+    downlink: number;
+    /**
+     * Returns the maximum downlink speed, in megabits per second (Mbps),
+     * for the underlying connection technology.
+     */
+    downlinkMax: number;
+    /**
+     * Returns the effective type of the connection meaning one of 'slow-2g', '2g', '3g', or '4g'.
+     * This value is determined using a combination of recently observed round-trip time and downlink values.
+     */
+    effectiveType: "slow-2g" | "2g" | "3g" | "4g";
+    /**
+     * Returns the estimated effective round-trip time of the current connection,
+     * rounded to the nearest multiple of 25 milliseconds.
+     */
+    rtt: number;
+    /**
+     * Returns true if the user has set a reduced data usage option on the user agent.
+     */
+    saveData: boolean;
+    /**
+     * Returns the type of connection a device is using to communicate with the network.
+     */
+    type: "bluetooth" | "cellular" | "ethernet" | "none" | "wifi" | "wimax" | "other" | "unknown";
+}
+
+// tslint:disable-next-line:interface-name
+declare global {
+    // tslint:disable-next-line:interface-name
+    interface Navigator {
+        connection: INetworkInformation;
+    }
+}
+
 const config = {
     // If the image gets within 50px in the Y axis, start the download.
     rootMargin: "50px 0px"
@@ -129,6 +169,66 @@ function onIntersection(entries: IntersectionObserverEntry[], obsvr: Intersectio
         }
     });
 }
+
+/**
+ * Inserts one node after another one
+ * @param newNode The node to insert
+ * @param referenceNode The node to insert it after
+ */
+function insertAfter(newNode: Node, referenceNode: Node): void {
+  referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+}
+
+/**
+ * Checks an area for video tags whose formats are not supported, and forcing their fallbacks
+ * @param lazyArea The area to check video tags in
+ */
+function setVideoFallback(lazyArea: DocumentFragment) {
+  let lowData = false;
+  if (navigator.connection) {
+    lowData = navigator.connection.saveData === true ||
+      navigator.connection.effectiveType === "slow-2g" ||
+      navigator.connection.effectiveType === "2g";
+  }
+  // DocumentFragments don't support getElementsByTagName
+  const lazyVideos = lazyArea.querySelectorAll("video");
+  for (let i = lazyVideos.length; i--;) {
+    const lazyVideo = lazyVideos[i];
+    let cantPlay = true;
+    if (lazyVideo.canPlayType) {
+      // Loop through the various source elements, and check if
+      // the browser thinks it can play them
+      // This works better if we specify the codec along with
+      // the MIME type
+      const sources = lazyVideo.getElementsByTagName("source");
+      for (let i2 = sources.length; i2--;) {
+        if (lazyVideo.canPlayType(sources[i2].type)) {
+          cantPlay = false;
+          break;
+        }
+      }
+    }
+    // If on a low-data connection, remove the autoplay attribute
+    // (it's only polite)
+    if (lowData) {
+      lazyVideo.removeAttribute("autoplay");
+      lazyVideo.setAttribute("controls", "");
+    }
+    // If you can't play any of the available formats, skip straight to fallback content
+    if (cantPlay) {
+      // Extract the fallback and replace the video with it
+      const children = lazyVideo.childNodes;
+      for (let i3 = children.length; i3--;) {
+        const childNode = children[i3];
+        if (!(childNode instanceof HTMLTrackElement) &&
+            !(childNode instanceof HTMLSourceElement)) {
+          insertAfter(childNode, lazyVideo);
+        }
+      }
+      lazyVideo.parentNode.removeChild(lazyVideo);
+    }
+  }
+}
 /**
  * Retrieve the elements from the 'lazy load' no script tags and prepare them for display
  */
@@ -155,6 +255,7 @@ function setUp(): void {
                 lazyArea.appendChild(lazyArea.childNodes[i1]);
             }
         }
+        setVideoFallback(lazyArea);
         // only delay loading if we can use the IntersectionObserver to check for visibility
         if (!observer) {
             noScriptTag.parentNode.replaceChild(lazyArea, noScriptTag);

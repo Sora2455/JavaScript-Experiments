@@ -54,6 +54,25 @@
                             alt="A image to test lazy loading"/>
                     </picture>
                 <!--[if !IE]><!--></noscript><!--<![endif]-->
+                <figure>
+                    <!--[if !IE]><!--><noscript data-lazy-load>
+                        <video height="338" width="600" autoplay loop muted>
+                            <!--<source src="./Sample.mp4"	type="video/mp4; codecs=avc1.42E01E,mp4a.40.2">-->
+                            <source src="/media/big-buck-bunny_trailer.webm" type="video/webm; codecs=vp8,vorbis">
+                            <!--<source src="/media/big-buck-bunny_trailer.ogv" type="video/ogg; codecs=theora,vorbis">-->
+                            <!--<![endif]-->
+                            <img src="/media/big-buck-bunny_trailer.gif" height="180" width="320"/>
+                            <!--[if !IE]><!-->
+                        </video>
+                    </noscript><!--<![endif]-->
+                    <figcaption>
+                        A bunny emerging from his den and stretching.
+                        <!--[if !IE]><!--><noscript aria-hidden="true"><p>
+                            Note: Without JavaScript, the above animation might not play. In that case, the animation can be directly accessed
+                            <a href="/media/big-buck-bunny_trailer.gif">here</a>.
+                        </p></noscript><!--<![endif]-->
+                    </figcaption>
+                </figure>
             </section>
             <section>
                 <p>Welcome one and all! Chose a test above to get started.</p>
