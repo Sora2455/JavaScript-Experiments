@@ -127,6 +127,7 @@ function prepareLazyContents(lazyArea: DocumentFragment): void {
     for (let i5 = lazyVideos.length; i5--;) {
         const lazyVideo = lazyVideos[i5];
         lazyVideo.preload = "none";
+        storeSourceForLater(lazyVideo, tempImg);
     }
 }
 /**
@@ -158,12 +159,10 @@ function onIntersection(entries: IntersectionObserverEntry[], obsvr: Intersectio
         // if the item is now visible, load it and stop watching it
         const lazyItem = entry.target;
         obsvr.unobserve(lazyItem);
+        restoreSource(lazyItem);
         if (lazyItem instanceof HTMLImageElement) {
             // just in case the img is the decendent of a picture element, check for source tags
             removeJammingSource(lazyItem.parentElement);
-            restoreSource(lazyItem);
-        } else if (lazyItem instanceof HTMLIFrameElement) {
-            restoreSource(lazyItem);
         } else if (lazyItem instanceof HTMLVideoElement || lazyItem instanceof HTMLAudioElement) {
             lazyItem.preload = "metadata";
         }
