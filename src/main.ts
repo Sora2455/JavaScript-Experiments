@@ -1,3 +1,4 @@
+import {AutoCompleteSearch} from "./modules/AutoComplete.js";
 import "./modules/LazyLoad.js";
 import "./modules/Localiser.js";
 import {onBuyClicked} from "./modules/PaymentRequest.js";
@@ -15,6 +16,22 @@ readyManager.whenReady(() => {
     const buyTest = document.getElementById("buyTest");
     if (buyTest) {
         buyTest.onclick = onBuyClicked;
+    }
+    const autocompleteTextbox = document.getElementById("autocomplete");
+    if (autocompleteTextbox instanceof HTMLInputElement) {
+        const suggestions = [
+            {key: "1", label: "First suggestion"},
+            {key: "2", label: "Second suggestion"},
+            {key: "3", label: "Third suggestion"},
+            {key: "4", label: "Forth suggestion"},
+            {key: "5", label: "Fifth suggestion"},
+            {key: "6", label: "Fifth suggestion"},
+            {key: "7", label: "Fifth suggestion"}
+        ];
+        const autoComplete = new AutoCompleteSearch(autocompleteTextbox, (_, callback) => {
+            callback(suggestions);
+        }, alert.bind(window));
+        autoComplete.setResults(suggestions);
     }
 });
 const printManager = new PrintManager();
