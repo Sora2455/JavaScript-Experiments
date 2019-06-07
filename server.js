@@ -40,7 +40,7 @@ server.listen(8080, function (err, address) {
 
 function setHeaders(res, path, stat){
     if (path.endsWith(".html")) {
-        res.setHeader("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; " +
+        res.setHeader("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; object-src 'none'; " +
             "base-uri 'none'; form-action 'self'; frame-ancestors 'self'");
         res.setHeader("Referrer-Policy", "same-origin");
         res.setHeader("Feature-Policy", "sync-xhr 'none'; document-write 'none'; vertical-scroll 'none'; " +
@@ -52,6 +52,7 @@ function setHeaders(res, path, stat){
         res.setHeader("X-Frame-Options", "sameorigin");
         res.setHeader("X-UA-Compatible", `IE=${ieVersion}`);
     }
+    res.setHeader("Cross-Origin-Resource-Policy", "same-site");
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("TK", "N");
     addMimeTypes(res, path);
