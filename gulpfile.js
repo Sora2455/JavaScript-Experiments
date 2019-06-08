@@ -1,33 +1,33 @@
 "use strict";
 const gulp = require("gulp");
-const postcss = require('gulp-postcss');
-const cssnano = require('cssnano');
-const uncss = require('uncss').postcssPlugin;
+const postcss = require("gulp-postcss");
+const cssnano = require("cssnano");
+const uncss = require("uncss").postcssPlugin;
 const ts = require("gulp-typescript");
-const replace = require('gulp-replace');
+const replace = require("gulp-replace");
 const extReplace = require("gulp-ext-replace");
-const uglifyEs = require('uglify-es');
-const composer = require('gulp-uglify/composer');
+const uglifyEs = require("uglify-es");
+const composer = require("gulp-uglify/composer");
 const uglify = composer(uglifyEs, console);
-const sourcemaps = require('gulp-sourcemaps');
-const htmlmin = require('gulp-htmlmin');
+const sourcemaps = require("gulp-sourcemaps");
+const htmlmin = require("gulp-htmlmin");
 const del = require("del");
-const browserify = require('browserify');
-const source = require('vinyl-source-stream');
-const buffer = require('vinyl-buffer');
-const merge = require('merge-stream');
-const glob = require('glob');
-const path = require('path');
+const browserify = require("browserify");
+const source = require("vinyl-source-stream");
+const buffer = require("vinyl-buffer");
+const merge = require("merge-stream");
+const glob = require("glob");
+const path = require("path");
 const {MathMlReplacer} = require("math-ml-now");
-const imagemin = require('gulp-imagemin');
-const imageminWebp = require('imagemin-webp');
-const ffmpeg = require('fluent-ffmpeg');
-const exec = require('child_process').exec;
-const realFavicon = require('gulp-real-favicon');
-const fs = require('fs');
+const imagemin = require("gulp-imagemin");
+const imageminWebp = require("imagemin-webp");
+const ffmpeg = require("fluent-ffmpeg");
+const exec = require("child_process").exec;
+const realFavicon = require("gulp-real-favicon");
+const fs = require("fs");
 
 // File where the favicon markups are stored
-const FAVICON_DATA_FILE = 'src/favicon/faviconData.json';
+const FAVICON_DATA_FILE = "src/favicon/faviconData.json";
 // Folder where the ffmeg binaries are stored
 const configJson = JSON.parse(fs.readFileSync("config.json"));
 ffmpeg.setFfmpegPath(configJson.ffmpegPath);
@@ -79,7 +79,7 @@ gulp.task("moduleCode", gulp.series("newModules", function(){
                     sourceMap: false
                 }))
                 .pipe(uglify(newModuleOptions))
-                .pipe(sourcemaps.write('./'))
+                .pipe(sourcemaps.write("./"))
                 .pipe(gulp.dest("build/modules"));
 }));
 
@@ -93,12 +93,12 @@ gulp.task("compileNoModuleCode", gulp.series("oldModules", function() {
                     removeComments: true,
                     sourceMap: false
                 }))
-                .pipe(sourcemaps.write('./'))
+                .pipe(sourcemaps.write("./"))
                 .pipe(gulp.dest("build/noModules"));
 }));
 
 gulp.task("noModuleCode", function() {
-    const files = glob.sync('build/noModules/*.js');
+    const files = glob.sync("build/noModules/*.js");
     return merge(files.map(function(file) {
         return browserify({
             entries: file,
@@ -108,7 +108,7 @@ gulp.task("noModuleCode", function() {
             .pipe(buffer())
             .pipe(sourcemaps.init({loadMaps: true}))
             .pipe(uglify(oldModuleOptions))
-            .pipe(sourcemaps.write('./'))
+            .pipe(sourcemaps.write("./"))
             .pipe(gulp.dest("build/noModules"))
       }));
 });
@@ -130,12 +130,12 @@ gulp.task("compileWorkerCode", function() {
                 }))
                 //Rewrite module path so that browserify knows where to look
                 .pipe(replace('"../modules/', '"./../noModules/modules/'))
-                .pipe(sourcemaps.write('./'))
+                .pipe(sourcemaps.write("./"))
                 .pipe(gulp.dest("build/workers"));
 });
 
 gulp.task("workerCode", gulp.series("compileWorkerCode", function() {
-    const files = glob.sync('build/workers/*.js');
+    const files = glob.sync("build/workers/*.js");
     return merge(files.map(function(file) {
         return browserify({
             entries: file,
@@ -145,7 +145,7 @@ gulp.task("workerCode", gulp.series("compileWorkerCode", function() {
             .pipe(buffer())
             .pipe(sourcemaps.init({loadMaps: true}))
             .pipe(uglify(oldModuleOptions))
-            .pipe(sourcemaps.write('./'))
+            .pipe(sourcemaps.write("./"))
             .pipe(gulp.dest("build/workers"))
       }));
 }));
@@ -162,7 +162,7 @@ gulp.task("polyfillsEs3", function() {
                     sourceMap: false
                 }))
                 .pipe(uglify(oldModuleOptions))
-                .pipe(sourcemaps.write('./'))
+                .pipe(sourcemaps.write("./"))
                 .pipe(gulp.dest("build/polyfills/es3"));
 });
 //Polyfills that require ES5 features
@@ -177,14 +177,14 @@ gulp.task("polyfillsEs5", function() {
                     sourceMap: false
                 }))
                 .pipe(uglify(oldModuleOptions))
-                .pipe(sourcemaps.write('./'))
+                .pipe(sourcemaps.write("./"))
                 .pipe(gulp.dest("build/polyfills/es5"));
 });
 
 gulp.task("polyfills", gulp.parallel("polyfillsEs3", "polyfillsEs5"));
 
 gulp.task("compileBytecode", function(done) {
-    exec('cd src && make.bat', function (err, stdout, stderr) {
+    exec("cd src && make.bat", function (err, stdout, stderr) {
         console.log(stdout);
         console.log(stderr);
         done(err);
@@ -314,7 +314,7 @@ gulp.task("media", gulp.parallel("mediaWebP", "mediaImages"));
 // You should run it at least once to create the icons. Then,
 // you should run it whenever RealFaviconGenerator updates its
 // package (see the check-for-favicon-update task below).
-gulp.task('generate-favicon', function(done) {
+gulp.task("generate-favicon", function(done) {
     //If we've already set up the favicon, skip this step
     if (fs.existsSync("build/favicon.ico")) {
         done();
@@ -322,14 +322,14 @@ gulp.task('generate-favicon', function(done) {
     }
 
 	realFavicon.generateFavicon({
-		masterPicture: 'src/favicon/favicon.svg',
-		dest: 'build',
-		iconsPath: '/',
+		masterPicture: "src/favicon/favicon.svg",
+		dest: "build",
+		iconsPath: "/",
 		design: {
 			ios: {
-				pictureAspect: 'backgroundAndMargin',
-				backgroundColor: '#ffffff',
-				margin: '14%',
+				pictureAspect: "backgroundAndMargin",
+				backgroundColor: "#ffffff",
+				margin: "14%",
 				assets: {
 					ios6AndPriorIcons: false,
 					ios7AndLaterIcons: false,
@@ -339,9 +339,9 @@ gulp.task('generate-favicon', function(done) {
 			},
 			desktopBrowser: {},
 			windows: {
-				pictureAspect: 'whiteSilhouette',
-				backgroundColor: '#da532c',
-				onConflict: 'override',
+				pictureAspect: "whiteSilhouette",
+				backgroundColor: "#da532c",
+				onConflict: "override",
 				assets: {
 					windows80Ie10Tile: false,
 					windows10Ie11EdgeTiles: {
@@ -353,13 +353,13 @@ gulp.task('generate-favicon', function(done) {
 				}
 			},
 			androidChrome: {
-				pictureAspect: 'noChange',
-				themeColor: '#d2cdcd',
+				pictureAspect: "noChange",
+				themeColor: "#d2cdcd",
 				manifest: {
-					name: 'JavaScript experiments',
-					display: 'standalone',
-					orientation: 'notSet',
-					onConflict: 'override',
+					name: "JavaScript experiments",
+					display: "standalone",
+					orientation: "notSet",
+					onConflict: "override",
 					declared: true
 				},
 				assets: {
@@ -368,12 +368,12 @@ gulp.task('generate-favicon', function(done) {
 				}
 			},
 			safariPinnedTab: {
-				pictureAspect: 'silhouette',
-				themeColor: '#5bbad5'
+				pictureAspect: "silhouette",
+				themeColor: "#5bbad5"
 			}
 		},
 		settings: {
-			scalingAlgorithm: 'Mitchell',
+			scalingAlgorithm: "Mitchell",
 			errorOnImageTooSmall: false,
 			readmeFile: false,
 			htmlCodeFile: false,
@@ -387,7 +387,7 @@ gulp.task('generate-favicon', function(done) {
 // released a new Touch icon along with the latest version of iOS).
 // Run this task from time to time. Ideally, make it part of your
 // continuous integration system.
-gulp.task('check-for-favicon-update', function() {
+gulp.task("check-for-favicon-update", function() {
 	var currentVersion = JSON.parse(fs.readFileSync(FAVICON_DATA_FILE)).version;
 	realFavicon.checkForUpdates(currentVersion, function(err) {
 		if (err) {
@@ -405,7 +405,7 @@ gulp.task("css", function() {
                     }),
                     cssnano()
                 ]))
-                .pipe(sourcemaps.write('./'))
+                .pipe(sourcemaps.write("./"))
                 .pipe(gulp.dest("build"));
 });
 
@@ -435,11 +435,14 @@ gulp.task("build", gulp.series("cleanScripts", gulp.parallel("html", "scripts"),
 
 gulp.task("fullBuild", gulp.series("fullClean", gulp.parallel("scripts", gulp.series("generate-favicon", "html", "media")), "css"));
 
-gulp.task("watch", function () {
-    gulp.watch('src/*.ts', gulp.series("scripts"));
-    gulp.watch('src/*/*.ts', gulp.series("scripts"));
-    gulp.watch('src/*/*.css', gulp.series("css"));
-    gulp.watch('src/*/*.html', gulp.series("html"));
+gulp.task("watch", function () {//TODO split up the script watch section into segments
+    gulp.watch("src/*.ts", gulp.parallel("moduleCode", gulp.series("compileNoModuleCode", "noModuleCode")));
+    gulp.watch("src/modules/*.ts", gulp.parallel("newModules", gulp.series("compileNoModuleCode", "noModuleCode")));
+    gulp.watch("src/workers/*.ts", gulp.series("compileNoModuleCode", "workerCode"));
+    gulp.watch("src/polyfills/es3/*.ts", gulp.series("polyfillsEs3"));
+    gulp.watch("src/polyfills/es5/*.ts", gulp.series("polyfillsEs5"));
+    gulp.watch("src/*/*.css", gulp.series("css"));
+    gulp.watch("src/*/*.html", gulp.series("html"));
 });
 
 gulp.task("default", gulp.series("build", "watch"));
