@@ -180,6 +180,7 @@ function loadAsmJs(url: string, stdlib: any, foreign: any, buffer: ArrayBuffer,
  */
 function instantiateAsmJs(moduleFileName: string, buffer: ArrayBuffer, callback: (module: IModuleExports) => void) {
     let instance = {} as any;
+    // @ts-ignore: No index on window
     instance = window[moduleFileName]({
         TOTAL_MEMORY: buffer.byteLength,
         TOTAL_STACK: buffer.byteLength,
