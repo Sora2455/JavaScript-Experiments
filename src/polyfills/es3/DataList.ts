@@ -1,5 +1,5 @@
 /*
- * Datalist polyfill - https://github.com/mfranzke/datalist-polyfill
+ * Datalist polyfill - based on https://github.com/mfranzke/datalist-polyfill
  * @license Copyright(c) 2017 by Maximilian Franzke
  * Supported by Christian, Johannes, @mitchhentges, @mertenhanisch, @ailintom, @Kravimir, @mischah,
  * @hryamzik, @ottoville, @IceCreamYou, @wlekin, @eddr, @beebee1987, @mricherzhagen, @acespace90,
@@ -227,6 +227,8 @@
         // We're using .getAttribute instead of .dataset here for IE10
         if (option && option.getAttribute("data-originalvalue")) {
             setInputValue(input, option.getAttribute("data-originalvalue"));
+            // Make sure other code knows we've modified the value
+            dispatchEvent(input, "input");
         }
     };
 
@@ -368,6 +370,22 @@
     // Binding the focus event - matching the input[list]s happens in the function afterwards
     dcmnt.addEventListener("focusin", changesInputList, true);
 
+    /** Create and dispatch an event; divided for IE9 usage */
+    const dispatchEvent = (input: HTMLInputElement, eventType: string) => {
+        let evt: Event;
+
+        if (typeof Event === "function") {
+            evt = new Event(eventType, {
+                bubbles: true
+            });
+        } else {
+            evt = dcmnt.createEvent("Event");
+            evt.initEvent(eventType, true, false);
+        }
+
+        input.dispatchEvent(evt);
+    };
+
     // Break here for IE10+ & EDGE
     if (isGteIE10 || isEDGE) {
         return;
@@ -452,7 +470,7 @@
 
         // Input the unused options as siblings next to the select - and differentiate
         // in between the regular, and the IE9 fix syntax upfront
-        (datalist.getElementsByTagName("select")[0] || datalist).appendChild(
+        (datalist.getElementsByClassName(classNamePolyfillingSelect)[0] || datalist).appendChild(
             disabledValues
         );
 
@@ -583,7 +601,7 @@
                 input.value = input.value.substr(0, input.value.length - 1);
 
                 // Dispatch the input event on the related input[list]
-                dispatchInputEvent(input);
+                dispatchEvent(input, "input");
             } else {
                 input.value += event.key;
             }
@@ -622,7 +640,7 @@
             setInputValue(input, datalistSelect.value);
 
             // Dispatch the input event on the related input[list]
-            dispatchInputEvent(input);
+            dispatchEvent(input, "input");
 
             // Finally focusing the input, as other browser do this as well
             if ((event as KeyboardEvent).key !== "Tab") {
@@ -643,22 +661,6 @@
 
         // Toggle the visibility of the datalist select according to previous checks
         toggleVisibility(visible, datalistSelect);
-    };
-
-    /** Create and dispatch the input event; divided for IE9 usage */
-    const dispatchInputEvent = (input: HTMLInputElement) => {
-        let evt: Event;
-
-        if (typeof Event === "function") {
-            evt = new Event("input", {
-                bubbles: true
-            });
-        } else {
-            evt = dcmnt.createEvent("Event");
-            evt.initEvent("input", true, false);
-        }
-
-        input.dispatchEvent(evt);
     };
 
     /** Toggle the visibility of the datalist select */

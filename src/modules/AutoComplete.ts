@@ -105,14 +105,7 @@ export class AutoCompleteSearch {
         while (this.dataList.lastChild) {
             this.dataList.removeChild(this.dataList.lastChild);
         }
-        let newResults: DocumentFragment | HTMLSelectElement = document.createDocumentFragment();
-        // Old browsers don't understand the datalist element, but fortunitly browsers that do ignore
-        // select elements nested inside them, showing only the option elements
-        // startpolyfill (compiler directive)
-        newResults = document.createElement("select");
-        newResults.style.display = "none";
-        newResults.disabled = true;
-        // endpolyfill
+        const newResults = document.createDocumentFragment();
         const usuedLabels = {} as IStringUsedDictionary;
 
         // Unlike my usual shortcut, we actually need to iterate forwards through this to preserve
