@@ -1,24 +1,17 @@
-declare global {
-    // tslint:disable-next-line:interface-name
-    interface Window {
-        [label: string]: any;
-    }
-}
-
 export function loadBytecode(url: string, stdlib: any, foreign: any, pages: number,
-                             callback: (exports: moduleExports, buffer: ArrayBuffer) => void): void {
+                             callback: (exports: IModuleExports, buffer: ArrayBuffer) => void): void {
     if ("WebAssembly" in window) {
         const buffer = new ArrayBuffer(0x10000 * pages);
         url = `${url}.js`;
         loadAsmJs(url, stdlib, foreign, buffer, (exports) => {
-            if (!exports) throw new Error("Unable to load wasm code!");
+            if (!exports) { throw new Error("Unable to load wasm code!"); }
             callback(exports, buffer);
         });
     } else if (typeof ArrayBuffer === "function") {
         const buffer = new ArrayBuffer(0x10000 * pages);
         url = url.replace(".wasm", ".asm.js");
         loadAsmJs(url, stdlib, foreign, buffer, (exports) => {
-            if (!exports) throw new Error("Unable to load asm.js code!");
+            if (!exports) { throw new Error("Unable to load asm.js code!"); }
             callback(exports, buffer);
         });
     } else {
@@ -28,6 +21,7 @@ export function loadBytecode(url: string, stdlib: any, foreign: any, pages: numb
 
 declare var WebAssembly: WebAssembly;
 
+// tslint:disable-next-line:interface-name
 interface WebAssembly {
     instantiateStreaming: (source: Promise<Response>, importObject?: any) => Promise<WebAssemblyResult>;
     instantiate: (source: WebAssemblyModule | ArrayBuffer, importObject?: any)
@@ -36,19 +30,23 @@ interface WebAssembly {
     Table: WebAssemblyTable;
 }
 
+// tslint:disable-next-line:interface-name
 interface WebAssemblyResult {
     module: WebAssemblyModule;
     instance: WebAssemblyInstance;
 }
 
+// tslint:disable-next-line:interface-name
 interface WebAssemblyModule {
 
 }
 
+// tslint:disable-next-line:interface-name
 interface WebAssemblyInstance {
-    exports: moduleExports;
+    exports: IModuleExports;
 }
 
+// tslint:disable-next-line:interface-name
 interface WebAssemblyMemoryDescriptor {
     /**
      * The initial size of the WebAssembly Memory, in units of WebAssembly pages (64KB).
@@ -76,18 +74,29 @@ declare class WebAssemblyMemory {
     constructor(options: WebAssemblyMemoryDescriptor);
 }
 
-interface WebAssemblyTable {
-    new(options: WebAssembleTableDescriptor): WebAssemblyTable;
-    /**Returns the length of the table, i.e. the number of elements. */
-    length: number;
-    /**Accessor function — gets the element stored at a given index. */
-    get: (index: number) => Function;
-    /**Sets an element stored at a given index to a given value. */
-    set: (index: number, value: Function) => void;
-    /**Increases the size of the Table instance by a specified number of elements. */
-    grow: (elements: number) => void;
+declare class WebAssemblyTable {
+    /**
+     * Returns the length of the table, i.e. the number of elements.
+     */
+    public length: number;
+    /**
+     * Accessor function — gets the element stored at a given index.
+     */
+    // tslint:disable-next-line:ban-types
+    public get: (index: number) => Function;
+    /**
+     * Sets an element stored at a given index to a given value.
+     */
+    // tslint:disable-next-line:ban-types
+    public set: (index: number, value: Function) => void;
+    /**
+     * Increases the size of the Table instance by a specified number of elements.
+     */
+    public grow: (elements: number) => void;
+    constructor(options: WebAssembleTableDescriptor);
 }
 
+// tslint:disable-next-line:interface-name
 interface WebAssembleTableDescriptor {
     /**
      * A string representing the type of value to be stored in the table.
@@ -128,7 +137,7 @@ function fetchWebassembly(url: string, importObject?: any): Promise<WebAssemblyR
     }
 }
 
-interface moduleExports {
+interface IModuleExports {
     [label: string]: (...args: any[]) => any;
 }
 
@@ -141,7 +150,7 @@ interface moduleExports {
  * @param callback A callback function that will be called with the module exports (or null, if there was an error)
  */
 function loadAsmJs(url: string, stdlib: any, foreign: any, buffer: ArrayBuffer,
-                   callback: (module: moduleExports) => void): void {
+                   callback: (module: IModuleExports) => void): void {
     const urlParts = url.split("/");
     const moduleFileName = urlParts[urlParts.length - 1].replace(/\./g, "");
     // first, check if the module has already been loaded
@@ -169,7 +178,7 @@ function loadAsmJs(url: string, stdlib: any, foreign: any, buffer: ArrayBuffer,
  * @param buffer The memory allocated for your function
  * @param callback A callback function that will be called with the module exports (or null, if there was an error)
  */
-function instantiateAsmJs(moduleFileName: string, buffer: ArrayBuffer, callback: (module: moduleExports) => void) {
+function instantiateAsmJs(moduleFileName: string, buffer: ArrayBuffer, callback: (module: IModuleExports) => void) {
     let instance = {} as any;
     instance = window[moduleFileName]({
         TOTAL_MEMORY: buffer.byteLength,
