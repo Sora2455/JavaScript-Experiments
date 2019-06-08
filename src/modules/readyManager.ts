@@ -69,9 +69,20 @@ export const Requirement: IFeatureList = {
     MessageChannel: {
         test: () => typeof MessageChannel === "function"
     },
+    MutationObserver: {
+        test: () => typeof MutationObserver === "function"
+    },
     Worker: {
         polyfillSrc: "/polyfills/es3/WebWorker.js",
         test: () => typeof Worker === "function"
+    },
+    datalist: {
+        polyfillSrc: "/polyfills/es3/DataList.js",
+        test: () => typeof HTMLDataListElement === "function" && !window.StyleMedia
+    },
+    matches: {
+        polyfillSrc: "/polyfills/es3/ElementMatches.js",
+        test: () => typeof Element.prototype.matches === "function"
     },
     reportValidity: {
         polyfillSrc: "/polyfills/es3/ReportValidity.js",
@@ -91,6 +102,7 @@ export const Requirement: IFeatureList = {
     }
 };
 Requirement.BroadcastChannel.polyfillRequires = [Requirement.MessageChannel];
+Requirement.datalist.polyfillRequires = [Requirement.matches];
 
 interface IAction {
     /**
@@ -108,7 +120,7 @@ interface IAction {
     /**
      * If false, this item requires features that can't be polyfilled
      */
-    canBeLoaded: boolean;
+    canBeLoaded?: boolean;
 }
 // startpolyfill (compiler directive)
 // tslint:disable
@@ -255,6 +267,9 @@ export class ReadyManager {
     public whenReady(callback: (() => void) | IAction, fallbackAction?: () => void): void {
         const action = typeof callback === "function" ?
             this.getAction(callback, fallbackAction) : callback;
+        if (typeof callback === "object") {
+            action.canBeLoaded = this.addPolyfill(callback.requirements);
+        }
         if (this.state.isReady) {
             this.runAction(action);
         } else {
@@ -276,6 +291,9 @@ export class ReadyManager {
     public whenLoaded(callback: (() => void) | IAction, fallbackAction?: () => void): void {
         const action = typeof callback === "function" ?
             this.getAction(callback, fallbackAction) : callback;
+        if (typeof callback === "object") {
+            action.canBeLoaded = this.addPolyfill(callback.requirements);
+        }
         if (this.state.isLoaded) {
             this.runAction(action);
         } else {
@@ -299,6 +317,14 @@ export class ReadyManager {
             if (!i.polyfillSrc) {
                 allLoading = false;
                 return;
+            }
+            if (Array.isArray(i.polyfillRequires)) {
+                // If this polyfill needs items that can't be polyfilled, this code can't run
+                // TODO handle polyfill queuing
+                if (!this.addPolyfill(i.polyfillRequires)) {
+                    allLoading = false;
+                    return;
+                }
             }
             // mark this item as loading
             i.loaded = true;
