@@ -12,6 +12,21 @@
  * Elsewhere the functionality gets emulated by a select element.
  */
 
+// tslint:disable-next-line:interface-name
+interface Document {
+    /**
+     * An IE-specific property that detects what version of the IE engine IE is running (IE8+)
+     */
+    documentMode: number;
+}
+// tslint:disable-next-line:interface-name
+interface Window {
+    /**
+     * A property both IE and Edge left exposed to the window that they probably shouldn't have
+     */
+    StyleMedia: any;
+}
+
 (() => {
     "use strict";
 
@@ -21,13 +36,13 @@
         // Feature detection
     const datalistSupported =
             "list" in dcmnt.createElement("input") &&
-            Boolean(dcmnt.createElement("datalist") &&  typeof HTMLDataListElement === "function");
-        // IE & EDGE browser detection via UserAgent
+            Boolean(dcmnt.createElement("datalist") && typeof HTMLDataListElement === "function");
+        // IE & EDGE browser detection
         // TODO: obviously ugly. But sadly necessary until Microsoft enhances the UX within EDGE
         // (compare to https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/9573654/)
         // adapted out of https://gist.github.com/gaboratorium/25f08b76eb82b1e7b91b01a0448f8b1d :
-    const isGteIE10 = Boolean(ua.match(/Trident\/[6-7]\./));
-    const isEDGE = Boolean(ua.indexOf("Edge/") !== -1);
+    const isGteIE10 = typeof document.documentMode === "number" && document.documentMode > 9;
+    const isEDGE = window.StyleMedia && !document.documentMode;
 
     // Let's break here, if it's even already supported ... and not IE10+ or EDGE
     if (datalistSupported && !isGteIE10 && !isEDGE) {
@@ -339,7 +354,7 @@
             }
         }
 
-        // Add class for identifying that this input is even already being polyfilled
+        // Add class for identifying that this input is already being polyfilled
         input.className += " " + classNameInput;
     };
 
