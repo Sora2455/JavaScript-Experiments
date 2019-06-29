@@ -25,10 +25,9 @@ server.register(serveStatic,
 {
     root: __dirname + "/build",
     maxAge: 1000 * 60 * 60 * 24,//Cache for a day at least
-    immutable: true,
     setHeaders: setHeaders,
-    lastModified: false,//The last modified header causes browsers to check for updates even with immutable specified
-    etag: false//Ditto for eTag
+    lastModified: true,
+    etag: true
 });
 server.listen(8080, function (err, address) {
     if (err) {
