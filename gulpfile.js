@@ -308,7 +308,7 @@ gulp.task("silentVideos", function(done){
     Promise.all(promises).then(() => { done(); }).catch(done);
 });
 
-gulp.task("media", gulp.parallel("mediaWebP", "mediaImages"));
+gulp.task("media", gulp.parallel("mediaWebP", "mediaImages", "silentVideos"));
 
 // Generate the icons. This task takes a few seconds to complete.
 // You should run it at least once to create the icons. Then,
