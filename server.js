@@ -49,6 +49,7 @@ function setHeaders(res, path, stat){
             "microphone 'none'; fullscreen 'none'; encrypted-media 'none'; document-domain 'none';" +
             "autoplay 'self'; geolocation 'none'; payment 'self'; vr 'none';");
         res.setHeader("X-Frame-Options", "sameorigin");
+        res.setHeader("Cross-Origin-Window-Policy", "Allow-PostMessage");
         res.setHeader("X-UA-Compatible", `IE=${ieVersion}`);
     }
     res.setHeader("Cross-Origin-Resource-Policy", "same-site");
