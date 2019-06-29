@@ -1,13 +1,3 @@
-declare global {
-    // tslint:disable-next-line:interface-name
-    interface Window {
-        /**
-         * A property both IE and Edge left exposed to the window that they probably shouldn't have
-         */
-        StyleMedia: any;
-    }
-}
-
 interface ISearchResult {
     label: string;
     key: string;
@@ -68,7 +58,6 @@ export class AutoCompleteSearch {
             throw new Error("Textbox needs to be inserted into a node before autocomplete can be set up");
         }
 
-        // TODO Edge doesn't fire events on selecting when search first (though IE does)
         if (textbox.list instanceof HTMLElement) {
             this.dataList = textbox.list as HTMLDataListElement;
         } else {
@@ -102,8 +91,12 @@ export class AutoCompleteSearch {
      */
     public setResults(results: ISearchResult[]): void {
         this.currentResults = results;
-        while (this.dataList.lastChild) {
-            this.dataList.removeChild(this.dataList.lastChild);
+
+        // polyfills for the datalist element insert a select element inside the datalist
+        // so we should leave that alone and only take the option elements out
+        const options = this.dataList.querySelectorAll("option");
+        for (let i = options.length; i--;) {
+            options[i].parentElement.removeChild(options[i]);
         }
         const newResults = document.createDocumentFragment();
         const usuedLabels = {} as IStringUsedDictionary;
@@ -123,7 +116,10 @@ export class AutoCompleteSearch {
             newResults.appendChild(option);
         }
 
-        this.dataList.appendChild(newResults);
+        // so put the options back were we found them
+        const optionStorageElement = this.dataList.getElementsByTagName("select")[0] || this.dataList;
+
+        optionStorageElement.appendChild(newResults);
     }
 
     /**
