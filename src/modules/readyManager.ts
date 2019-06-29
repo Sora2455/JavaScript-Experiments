@@ -7,6 +7,10 @@ declare global {
     // tslint:disable-next-line:interface-name
     interface Window {
         /**
+         * A property both IE and Edge left exposed to the window that they probably shouldn't have
+         */
+        StyleMedia: any;
+        /**
          * This is a proprietary Microsoft Internet Explorer alternative
          * to the standard EventTarget.addEventListener() method.
          * @param eventNameWithOn The name of the event to listen for, prefixed with "on",
@@ -438,14 +442,17 @@ export class ReadyManager {
      * @param actionStack The array of actions to try and run
      */
     private runCallbacks(actionStack: IAction[]): void {
-        for (let i = 0; i < actionStack.length; i++) {
+        for (let i = 0; i <= actionStack.length; i++) {
             const action = actionStack[i];
+            if (!action) { continue; }
             let dependenciesMet = true;
-            action.requirements.forEach((requrement) => {
-                if (!requrement.test()) {
-                    dependenciesMet = false;
-                }
-            });
+            if (Array.isArray(action.requirements)){
+                action.requirements.forEach((requrement) => {
+                    if (!requrement.test()) {
+                        dependenciesMet = false;
+                    }
+                });
+            }
             if (dependenciesMet) {
                 // remove the action from the stack
                 actionStack.splice(i, 1);
