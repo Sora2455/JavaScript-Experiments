@@ -11,6 +11,11 @@ declare global {
          */
         StyleMedia: any;
         /**
+         * A flag set on the window to let us know that the fix for Trident/EdgeHTML's datalist implementation
+         * (which searches only the beginning of the string, not the whole string) is in place.
+         */
+        msDataListFix: boolean;
+        /**
          * This is a proprietary Microsoft Internet Explorer alternative
          * to the standard EventTarget.addEventListener() method.
          * @param eventNameWithOn The name of the event to listen for, prefixed with "on",
@@ -82,7 +87,7 @@ export const Requirement: IFeatureList = {
     },
     datalist: {
         polyfillSrc: "/polyfills/es3/DataList.js",
-        test: () => typeof HTMLDataListElement === "function" && !window.StyleMedia
+        test: () => typeof HTMLDataListElement !== "undefined" && (!window.StyleMedia || window.msDataListFix === true)
     },
     matches: {
         polyfillSrc: "/polyfills/es3/ElementMatches.js",
@@ -442,11 +447,11 @@ export class ReadyManager {
      * @param actionStack The array of actions to try and run
      */
     private runCallbacks(actionStack: IAction[]): void {
-        for (let i = 0; i <= actionStack.length; i++) {
+        for (let i = actionStack.length; i--;) {
             const action = actionStack[i];
             if (!action) { continue; }
             let dependenciesMet = true;
-            if (Array.isArray(action.requirements)){
+            if (Array.isArray(action.requirements)) {
                 action.requirements.forEach((requrement) => {
                     if (!requrement.test()) {
                         dependenciesMet = false;

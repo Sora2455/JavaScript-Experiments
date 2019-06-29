@@ -25,6 +25,11 @@ interface Window {
      * A property both IE and Edge left exposed to the window that they probably shouldn't have
      */
     StyleMedia: any;
+    /**
+     * A flag set on the window to let us know that the fix for Trident/EdgeHTML's datalist implementation
+     * (which searches only the beginning of the string, not the whole string) is in place.
+     */
+    msDataListFix: boolean;
 }
 
 (() => {
@@ -32,7 +37,6 @@ interface Window {
 
     // Performance: Set local variables
     const dcmnt = window.document;
-    const ua = window.navigator.userAgent;
         // Feature detection
     const datalistSupported =
             "list" in dcmnt.createElement("input") &&
@@ -43,6 +47,7 @@ interface Window {
         // adapted out of https://gist.github.com/gaboratorium/25f08b76eb82b1e7b91b01a0448f8b1d :
     const isGteIE10 = typeof document.documentMode === "number" && document.documentMode > 9;
     const isEDGE = window.StyleMedia && !document.documentMode;
+    if (window.StyleMedia) { window.msDataListFix = true; }
 
     // Let's break here, if it's even already supported ... and not IE10+ or EDGE
     if (datalistSupported && !isGteIE10 && !isEDGE) {
