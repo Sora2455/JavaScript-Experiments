@@ -259,6 +259,8 @@ gulp.task("html", function() {
                     const filePath = encodeURIComponent(origin + "/" + endpoint);
                     const tweetText = encodeURIComponent("???");
                     return `<page-share>
+                                <details>
+                                <summary><h2>Share me</h2></summary>
                                 <p><a href="https://www.facebook.com/sharer.php?u=${filePath}" target="socialWindow">
                                     Share on Facebook
                                 </a></p>
@@ -271,6 +273,7 @@ gulp.task("html", function() {
                                 <p><a href="mailto:?body=${filePath}">
                                     Share via email
                                 </a></p>
+                                </details>
                             </page-share>`;
                 }))
                 .pipe(realFavicon.injectFaviconMarkups(JSON.parse(fs.readFileSync(FAVICON_DATA_FILE)).favicon.html_code))

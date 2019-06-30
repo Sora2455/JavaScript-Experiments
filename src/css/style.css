@@ -313,6 +313,11 @@ table {
     border-collapse: collapse;
 }
 
+details h2 {
+    display: inline-block;
+    margin-bottom: 0;
+}
+
 /**
  * Correct the text style of placeholders in Chrome, Edge, and Safari.
  */
