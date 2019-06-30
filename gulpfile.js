@@ -32,6 +32,7 @@ const FAVICON_DATA_FILE = "src/favicon/faviconData.json";
 const configJson = JSON.parse(fs.readFileSync("config.json"));
 ffmpeg.setFfmpegPath(configJson.ffmpegPath);
 ffmpeg.setFfprobePath(configJson.ffprobePath);
+const origin = configJson.origin;
 const gifConvertOptions = "[0:v] fps=12,scale=320:-1:flags=lanczos,split [a][b];[a] palettegen [p];[b][p] paletteuse";
 
 const polyfillRegex = /\/\/ startpolyfill[\s\S]*?\/\/ endpolyfill/g;
@@ -252,6 +253,26 @@ gulp.task("html", function() {
     return gulp.src("src/html/*.html")
                 .pipe(replacer)
                 .pipe(replace("/src/", "/"))
+                .pipe(replace("[[origin]]", origin))
+                .pipe(replace("<page-share></page-share>", function() {
+                    const endpoint = this.file.stem === "index" ? "" : this.file.stem;
+                    const filePath = encodeURIComponent(origin + "/" + endpoint);
+                    const tweetText = encodeURIComponent("???");
+                    return `<page-share>
+                                <p><a href="https://www.facebook.com/sharer.php?u=${filePath}" target="socialWindow">
+                                    Share on Facebook
+                                </a></p>
+                                <p><a href="https://twitter.com/intent/tweet?url=${filePath}&text=${tweetText}" target="socialWindow">
+                                    Share on Twitter
+                                </a></p>
+                                <p><a href="https://www.linkedin.com/shareArticle?mini=true&url=${filePath}" target="socialWindow">
+                                    Share on LinkedIn
+                                </a></p>
+                                <p><a href="mailto:?body=${filePath}">
+                                    Share via email
+                                </a></p>
+                            </page-share>`;
+                }))
                 .pipe(realFavicon.injectFaviconMarkups(JSON.parse(fs.readFileSync(FAVICON_DATA_FILE)).favicon.html_code))
                 .pipe(htmlmin({
                     collapseWhitespace: true,

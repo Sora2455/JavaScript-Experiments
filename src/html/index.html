@@ -5,6 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="Description" content="A dummy site to experiment with HTML, CSS, and JavaScript.">
         <title>JavaScript experiments demo</title>
+        <meta property="og:title" content="JavaScript experiments demo">
+        <meta property="og:description" content="A dummy site to experiment with HTML, CSS, and JavaScript.">
+        <meta property="og:image" content="[[origin]]/safari-pinned-tab.svg">
+        <meta property="og:url" content="[[origin]]">
+        <meta name="twitter:card" content="summary">
         <!--[if lte IE 8]><link rel="stylesheet" href="ie8.css" /><![endif]-->
         <link rel="stylesheet" href="style.css" />
         <link rel="stylesheet" href="print.css" media="print"/>
@@ -49,7 +54,10 @@
                 </figure>
                 <hr>
                 <h2>Page timing information</h2>
-                <timing-information/>
+                <timing-information></timing-information>
+                <hr>
+                <h2>Share me</h2>
+                <page-share></page-share>
             </section>
             <section id="3">
                 <h2>Lazy load</h2>
