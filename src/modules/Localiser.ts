@@ -27,6 +27,7 @@ if (typeof Intl === "object") {
     const manager = new ReadyManager();
     manager.whenReady(localiseTimes);
     manager.whenReady(localiseNumbers);
+    manager.whenReady(tryAddShareButton);
     // if the user changes their langauge (how often will THAT happen?!) change with it
     document.addEventListener("languagechange", localiseTimes);
     document.addEventListener("languagechange", localiseNumbers);
@@ -93,4 +94,51 @@ function localiseNumbers() {
                 break;
         }
     }
+}
+
+interface IWebShareOptions {
+    title?: string;
+    text?: string;
+    url?: string;
+}
+declare global {
+    // tslint:disable-next-line:interface-name
+    interface Navigator {
+        share: (ops: IWebShareOptions) => Promise<null>;
+    }
+}
+
+/**
+ * If the Web Share API is supported, replace the Share links with one generic share button
+ */
+function tryAddShareButton() {
+    if (navigator.share) {
+        const shareAreas = document.querySelectorAll("page-share");
+        for (let i = shareAreas.length; i--;) {
+            const shareArea = shareAreas[i];
+            // Empty the current share area
+            while (shareArea.firstChild) {
+                shareArea.removeChild(shareArea.firstChild);
+            }
+            // Add the header back in
+            const header = document.createElement("h2");
+            header.textContent = "Share me";
+            shareArea.appendChild(header);
+            // Then add the shiny new share button
+            const shareButton = document.createElement("button");
+            shareButton.addEventListener("click", shareCurrentPage);
+            shareButton.textContent = "Share";
+            shareArea.appendChild(shareButton);
+        }
+    }
+}
+
+/**
+ * Share the current page on using the Web Share API
+ */
+function shareCurrentPage() {
+    const title = document.title;
+    const canonicalUrlElem = document.querySelector("link[rel=canonical]") as HTMLLinkElement;
+    const url = canonicalUrlElem ? canonicalUrlElem.href : location.href;
+    navigator.share({title, url});
 }
