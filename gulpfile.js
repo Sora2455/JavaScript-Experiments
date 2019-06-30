@@ -257,7 +257,7 @@ gulp.task("html", function() {
                 .pipe(replace("<page-share></page-share>", function() {
                     const endpoint = this.file.stem === "index" ? "" : this.file.stem;
                     const filePath = encodeURIComponent(origin + "/" + endpoint);
-                    const tweetText = encodeURIComponent("???");
+                    const tweetText = encodeURIComponent("A dummy site to experiment with HTML, CSS, and JavaScript.");
                     return `<page-share>
                                 <details>
                                 <summary><h2>Share me</h2></summary>

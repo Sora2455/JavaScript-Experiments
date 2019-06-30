@@ -130,6 +130,18 @@ function tryAddShareButton() {
             shareButton.textContent = "Share";
             shareArea.appendChild(shareButton);
         }
+    } else {
+        // The default Twitter share URLs don't take the page description into account (yet)
+        const twitterShareLinks =
+            document.querySelectorAll("page-share a[href^='https://twitter.com']") as NodeListOf<HTMLAnchorElement>;
+        const canonicalUrlElem = document.querySelector("link[rel=canonical]") as HTMLLinkElement;
+        const url = canonicalUrlElem ? canonicalUrlElem.href : location.href;
+        const description = document.querySelector("meta[name='Description']").getAttribute("content");
+        const fixedTwitterLink = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`
+            + `&text=${encodeURIComponent(description)}`;
+        for (let i = twitterShareLinks.length; i--;) {
+            twitterShareLinks[i].href = fixedTwitterLink;
+        }
     }
 }
 
