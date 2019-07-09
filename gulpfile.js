@@ -459,7 +459,7 @@ gulp.task("build", gulp.series("cleanScripts", gulp.parallel("html", "scripts"),
 
 gulp.task("fullBuild", gulp.series("fullClean", gulp.parallel("scripts", gulp.series("generate-favicon", "html", "media")), "css"));
 
-gulp.task("watch", function () {//TODO split up the script watch section into segments
+gulp.task("watch", function () {
     gulp.watch("src/*.ts", gulp.parallel("moduleCode", gulp.series("compileNoModuleCode", "noModuleCode")));
     gulp.watch("src/modules/*.ts", gulp.parallel("newModules", gulp.series("compileNoModuleCode", "noModuleCode")));
     gulp.watch("src/workers/*.ts", gulp.series("compileNoModuleCode", "workerCode"));
