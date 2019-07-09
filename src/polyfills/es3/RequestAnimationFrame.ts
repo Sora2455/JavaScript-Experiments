@@ -5,21 +5,23 @@
 
 // MIT license
 
-(function() {
+(() => {
     let lastTime = 0;
 
-    if (!window.requestAnimationFrame)
-        window.requestAnimationFrame = function(callback: FrameRequestCallback): number {
+    if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = (callback: FrameRequestCallback) => {
             const currTime = new Date().getTime();
             const timeToCall = Math.max(0, 16 - (currTime - lastTime));
-            const id = window.setTimeout(function() { callback(currTime + timeToCall); },
+            const id = window.setTimeout(() => { callback(currTime + timeToCall); },
               timeToCall);
             lastTime = currTime + timeToCall;
             return id;
         };
+    }
 
-    if (!window.cancelAnimationFrame)
-        window.cancelAnimationFrame = function(id: number): void {
+    if (!window.cancelAnimationFrame) {
+        window.cancelAnimationFrame = (id: number) => {
             clearTimeout(id);
         };
+    }
 }());
