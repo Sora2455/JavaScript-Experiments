@@ -71,10 +71,6 @@ interface IFeatureList {
 }
 
 export const Requirement: IFeatureList = {
-    BroadcastChannel: {
-        polyfillSrc: "/polyfills/es5/BroadcastChannel.js",
-        test: () => typeof BroadcastChannel === "function"
-    },
     MessageChannel: {
         test: () => typeof MessageChannel === "function"
     },
@@ -110,7 +106,6 @@ export const Requirement: IFeatureList = {
         test: () => !navigator.sendBeacon
     }
 };
-Requirement.BroadcastChannel.polyfillRequires = [Requirement.MessageChannel];
 Requirement.datalist.polyfillRequires = [Requirement.matches];
 
 interface IAction {
