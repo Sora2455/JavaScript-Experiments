@@ -4,7 +4,7 @@
   "description": "Testing TypeScript, Gulp, and other JS frameworks",
   "license": "MIT",
   "dependencies": {
-    "browserify": "^16.2.3",
+    "browserify": "^16.3.0",
     "canvas": "^1.6.13",
     "cssnano": "^4.1.4",
     "del": "^3.0.0",
@@ -26,7 +26,7 @@
     "math-ml-now": "^2.0.1",
     "merge-stream": "^1.0.1",
     "path": "^0.12.7",
-    "typescript": "^3.5.2",
+    "typescript": "^3.5.3",
     "uglify-es": "^3.3.10",
     "uncss": "^0.16.2",
     "vinyl-buffer": "^1.0.1",
