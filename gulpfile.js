@@ -244,6 +244,33 @@ const responsiveImageConfig = [{
     }
 }];
 
+/**
+ * Adds a simple, no JS widget for sharing the current page on social media.
+ * The localisation module, if loaded, will attempt to replace this with the Web Share API.
+ */
+function addShareWidget() {
+    const endpoint = this.file.stem === "index" ? "" : this.file.stem;
+    const filePath = encodeURIComponent(origin + "/" + endpoint);
+    const tweetText = encodeURIComponent("A dummy site to experiment with HTML, CSS, and JavaScript.");
+    return `<page-share>
+                <details>
+                <summary><h2>Share me</h2></summary>
+                <p><a href="https://www.facebook.com/sharer.php?u=${filePath}" target="socialWindow">
+                    Share on Facebook
+                </a></p>
+                <p><a href="https://twitter.com/intent/tweet?url=${filePath}&text=${tweetText}" target="socialWindow">
+                    Share on Twitter
+                </a></p>
+                <p><a href="https://www.linkedin.com/shareArticle?mini=true&url=${filePath}" target="socialWindow">
+                    Share on LinkedIn
+                </a></p>
+                <p><a href="mailto:?body=${filePath}">
+                    Share via email
+                </a></p>
+                </details>
+            </page-share>`;
+}
+
 gulp.task("html", function() {
     const replacer = new MathMlReplacer({
         formatName: "TeX",
@@ -254,28 +281,7 @@ gulp.task("html", function() {
                 .pipe(replacer)
                 .pipe(replace("/src/", "/"))
                 .pipe(replace("[[origin]]", origin))
-                .pipe(replace("<page-share></page-share>", function() {
-                    const endpoint = this.file.stem === "index" ? "" : this.file.stem;
-                    const filePath = encodeURIComponent(origin + "/" + endpoint);
-                    const tweetText = encodeURIComponent("A dummy site to experiment with HTML, CSS, and JavaScript.");
-                    return `<page-share>
-                                <details>
-                                <summary><h2>Share me</h2></summary>
-                                <p><a href="https://www.facebook.com/sharer.php?u=${filePath}" target="socialWindow">
-                                    Share on Facebook
-                                </a></p>
-                                <p><a href="https://twitter.com/intent/tweet?url=${filePath}&text=${tweetText}" target="socialWindow">
-                                    Share on Twitter
-                                </a></p>
-                                <p><a href="https://www.linkedin.com/shareArticle?mini=true&url=${filePath}" target="socialWindow">
-                                    Share on LinkedIn
-                                </a></p>
-                                <p><a href="mailto:?body=${filePath}">
-                                    Share via email
-                                </a></p>
-                                </details>
-                            </page-share>`;
-                }))
+                .pipe(replace("<page-share></page-share>", addShareWidget))
                 .pipe(realFavicon.injectFaviconMarkups(JSON.parse(fs.readFileSync(FAVICON_DATA_FILE)).favicon.html_code))
                 .pipe(htmlmin({
                     collapseWhitespace: true,
