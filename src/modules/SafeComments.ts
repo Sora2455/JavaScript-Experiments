@@ -185,7 +185,7 @@ interface ICommentData {
                 const commentUrl = this.getAttribute("comment-url");
                 if (this.loadingFromUrl !== commentUrl) {
                     this.loadingFromUrl = commentUrl;
-                    fetch(this.getAttribute("comment-url"))
+                    fetch(commentUrl)
                         .then((response) => {
                             return response.json();
                         })
