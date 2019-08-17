@@ -391,3 +391,11 @@ svg image.mml-i {
         display: none;
     }
 }
+
+body:defined .hide-if-custom-elements-supported {
+    display: none;
+}
+
+body:defined .show-if-custom-elements-supported {
+    display: block;
+}
