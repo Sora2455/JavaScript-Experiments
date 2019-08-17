@@ -114,6 +114,7 @@ interface ICommentData {
     class SafeComments extends HTMLElement {
         private content: HTMLIFrameElement;
         private resizeObserver: ResizeObserver;
+        private loadingFromUrl: string;
         // Specify observed attributes so that
         // attributeChangedCallback will work
         static get observedAttributes() {
@@ -181,13 +182,17 @@ interface ICommentData {
                 const commentData = JSON.parse(this.getAttribute("comment-data"));
                 this.writeCommentsIntoIFrame(commentData);
             } else if (this.hasAttribute("comment-url")) {
-                fetch(this.getAttribute("comment-url"))
-                    .then((response) => {
-                        return response.json();
-                    })
-                    .then((commentData) => {
-                        this.writeCommentsIntoIFrame(commentData);
-                    });
+                const commentUrl = this.getAttribute("comment-url");
+                if (this.loadingFromUrl !== commentUrl) {
+                    this.loadingFromUrl = commentUrl;
+                    fetch(this.getAttribute("comment-url"))
+                        .then((response) => {
+                            return response.json();
+                        })
+                        .then((commentData) => {
+                            this.writeCommentsIntoIFrame(commentData);
+                        });
+                }
             }
         }
 

