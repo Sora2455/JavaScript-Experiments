@@ -13,11 +13,11 @@ body {
 }
 
 .comment {
-    --commentBackgroudColor: rgb(25, 31, 45, 100);
-    --commentFontColor: white;
-    --commentTimeColor: rgb(150, 150, 150);
-    --commentLinkColor: rgb(0, 255, 0);
-    --commentLinkVisitedColor: rgb(168, 168, 255);
+    --commentBackgroudColor: rgb(235, 235, 235, 100);
+    --commentFontColor: black;
+    --commentTimeColor: rgb(55, 81, 6);
+    --commentLinkColor: rgb(0, 0, 155);
+    --commentLinkVisitedColor: rgb(138, 0, 0);
 
     border: 1px solid red;
     max-height: 12rem;/* stylelint-disable-line */
@@ -27,6 +27,16 @@ body {
     overflow: hidden;
     border-radius: 5px;/* stylelint-disable-line */
     margin: 0.5rem;/* stylelint-disable-line */
+}
+
+@media (prefers-color-scheme: dark) {/* stylelint-disable-line */
+    .comment {
+        --commentBackgroudColor: rgb(25, 31, 45, 100);
+        --commentFontColor: white;
+        --commentTimeColor: rgb(150, 150, 150);
+        --commentLinkColor: rgb(0, 255, 0);
+        --commentLinkVisitedColor: rgb(168, 168, 255);
+    }
 }
 
 .comment > h6 {
@@ -40,7 +50,7 @@ body {
 
 .comment > label.readMore {
     position: absolute;
-    top: 7rem;/* stylelint-disable-line */
+    top: 7.7rem;/* stylelint-disable-line */
     left: 0;
     width: 100%;
     text-align: center;
