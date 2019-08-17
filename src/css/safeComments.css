@@ -71,7 +71,7 @@ body {
     max-height: none;
 }
 
-.comment:focus-within .readMore {
+.comment:focus-within > label.readMore {
     display: none;
 }
 
