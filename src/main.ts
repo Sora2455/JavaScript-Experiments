@@ -5,6 +5,9 @@ import {onBuyClicked} from "./modules/PaymentRequest.js";
 import {PrintManager} from "./modules/PrintManager.js";
 import {ReadyManager, Requirement} from "./modules/readyManager.js";
 // import {loadBytecode} from "./modules/LoadBytecode.js";
+// startnopolyfill (compiler directive)
+import "./modules/SafeComments.js";
+// endnopolyfill
 
 const readyManager = new ReadyManager();
 /*manager.whenReady(() => {

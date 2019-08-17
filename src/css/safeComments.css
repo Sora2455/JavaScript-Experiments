@@ -1,0 +1,88 @@
+body {
+    box-sizing: border-box;
+    margin: 0;
+}
+
+/* uncss:ignore start */
+/* stylelint-disable */
+*,
+*::before,
+*::after {
+    /* stylelint-enable */
+    box-sizing: inherit;
+}
+
+.comment {
+    --commentBackgroudColor: rgb(25, 31, 45, 100);
+    --commentFontColor: white;
+    --commentTimeColor: rgb(150, 150, 150);
+    --commentLinkColor: rgb(0, 255, 0);
+    --commentLinkVisitedColor: rgb(168, 168, 255);
+
+    border: 1px solid red;
+    max-height: 12rem;/* stylelint-disable-line */
+    background-color: var(--commentBackgroudColor);
+    color: var(--commentFontColor);
+    position: relative;
+    overflow: hidden;
+    border-radius: 5px;/* stylelint-disable-line */
+    margin: 0.5rem;/* stylelint-disable-line */
+}
+
+.comment > h6 {
+    font-size: 1rem;/* stylelint-disable-line */
+    display: inline;
+}
+
+.comment > time {
+    color: var(--commentTimeColor);
+}
+
+.comment > label.readMore {
+    position: absolute;
+    top: 7rem;/* stylelint-disable-line */
+    left: 0;
+    width: 100%;
+    text-align: center;
+    margin: 0;
+    padding: 3rem 0 0 0;/* stylelint-disable-line */
+
+    /* "transparent" only works here because it means the same as rgba(0,0,0,0) */
+    background-image: linear-gradient(to bottom, transparent, var(--commentBackgroudColor));/* stylelint-disable-line */
+}
+
+.comment a:link {
+    color: var(--commentLinkColor);
+}
+
+.comment a:visited {
+    color: var(--commentLinkVisitedColor);
+}
+
+.comment .contents {
+    max-height: 9rem;/* stylelint-disable-line */
+}
+
+.comment:focus-within {
+    max-height: none;
+}
+
+.comment:focus-within .contents {
+    max-height: none;
+}
+
+.comment:focus-within .readMore {
+    display: none;
+}
+
+.readMoreCheckbox:checked + .comment {/* stylelint-disable-line */
+    max-height: none;
+}
+
+.readMoreCheckbox:checked + .comment .contents {/* stylelint-disable-line */
+    max-height: none;
+}
+
+.readMoreCheckbox:checked + .comment > label.readMore {/* stylelint-disable-line */
+    display: none;
+}

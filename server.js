@@ -40,7 +40,7 @@ server.listen(8080, function (err, address) {
 function setHeaders(res, path, stat){
     if (path.endsWith(".html")) {
         res.setHeader("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; object-src 'none'; " +
-            "base-uri 'none'; form-action 'self'; frame-ancestors 'self'");
+            "base-uri 'self'; form-action 'self'; frame-ancestors 'self'");
         res.setHeader("Referrer-Policy", "same-origin");
         res.setHeader("Feature-Policy", "sync-xhr 'none'; document-write 'none'; vertical-scroll 'none'; " +
             "sync-script 'none'; image-compression 'none'; legacy-image-formats 'none'; " +

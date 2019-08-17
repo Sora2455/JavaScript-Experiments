@@ -36,6 +36,7 @@ const origin = configJson.origin;
 const gifConvertOptions = "[0:v] fps=12,scale=320:-1:flags=lanczos,split [a][b];[a] palettegen [p];[b][p] paletteuse";
 
 const polyfillRegex = /\/\/ startpolyfill[\s\S]*?\/\/ endpolyfill/g;
+const noPolyfillRegex = /\/\/ startnopolyfill[\s\S]*?\/\/ endnopolyfill/g;
 
 const oldModuleOptions = {ie8:true};
 const newModuleOptions = {safari10:true};
@@ -59,6 +60,8 @@ gulp.task("newModules", function(){
 
 gulp.task("oldModules", function(){
     return gulp.src("src/Modules/*.ts")
+                //Old browsers cannot run features enclosed by this marker
+                .pipe(replace(noPolyfillRegex, ""))
                 .pipe(ts({
                     noImplicitAny: true,
                     target: "ES3",
@@ -86,6 +89,8 @@ gulp.task("moduleCode", gulp.series("newModules", function(){
 
 gulp.task("compileNoModuleCode", gulp.series("oldModules", function() {
     return gulp.src("src/*.ts")
+                //Old browsers cannot run features enclosed by this marker
+                .pipe(replace(noPolyfillRegex, ""))
                 .pipe(sourcemaps.init({loadMaps: true}))
                 .pipe(ts({
                     noImplicitAny: true,
