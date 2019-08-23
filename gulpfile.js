@@ -24,6 +24,7 @@ const imageminWebp = require("imagemin-webp");
 const ffmpeg = require("fluent-ffmpeg");
 const exec = require("child_process").exec;
 const realFavicon = require("gulp-real-favicon");
+const bust = require("gulp-buster");
 const fs = require("fs");
 
 // File where the favicon markups are stored
@@ -444,6 +445,35 @@ gulp.task("css", function() {
                 .pipe(gulp.dest("build"));
 });
 
+gulp.task("getResourceHashes", function() {
+    return gulp.src("build/**/*.{css,js}")
+        .pipe(bust({
+            relativePath: "build"
+        }))
+        .pipe(gulp.dest("build"));
+});
+
+/**
+ * Escapes a string for inclusion in a regular expresion
+ * @param {string} string A string to include in a regular expresion
+ */
+function escapeRegExp(string) {
+    //https://stackoverflow.com/a/6969486/7077589
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
+gulp.task("implementResourceHashes", function() {
+    const hashList = JSON.parse(fs.readFileSync("build/busters.json"));
+    const hashFileRegex = new RegExp(Object.keys(hashList).map(escapeRegExp).join("|"), "gi");
+    return gulp.src("build/**/*.{css,js,html}")
+        .pipe(replace(hashFileRegex, function (match, p1) {
+            return match + "?v=" + hashList[match];
+        }))
+        .pipe(gulp.dest("build"));
+});
+
+gulp.task("cacheBust", gulp.series("getResourceHashes", "implementResourceHashes"));
+
 gulp.task("cleanModules", function() {
     return del("build/modules");
 });
@@ -466,9 +496,9 @@ gulp.task("fullClean", function() {
     return del("build");
 });
 
-gulp.task("build", gulp.series("cleanScripts", gulp.parallel("html", "scripts"), "css"));
+gulp.task("build", gulp.series("cleanScripts", gulp.parallel("html", "scripts"), "css", "cacheBust"));
 
-gulp.task("fullBuild", gulp.series("fullClean", gulp.parallel("scripts", gulp.series("generate-favicon", "html", "media")), "css"));
+gulp.task("fullBuild", gulp.series("fullClean", gulp.parallel("scripts", gulp.series("generate-favicon", "html", "media")), "css", "cacheBust"));
 
 gulp.task("watch", function () {
     gulp.watch("src/*.ts", gulp.parallel("moduleCode", gulp.series("compileNoModuleCode", "noModuleCode")));
