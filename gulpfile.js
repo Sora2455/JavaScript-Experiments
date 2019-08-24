@@ -504,7 +504,7 @@ gulp.task("fullClean", function() {
 
 gulp.task("build", gulp.series("cleanScripts", gulp.parallel("html", "scripts"), "css"));
 
-gulp.task("fullBuild", gulp.series("fullClean", gulp.parallel("scripts", gulp.series("html", "media")), "css", "cacheBust"));
+gulp.task("fullBuild", gulp.series("fullClean", gulp.parallel("scripts", gulp.series("generate-favicon", "html", "media")), "css", "cacheBust"));
 
 gulp.task("watch", function () {
     gulp.watch("src/*.ts", gulp.parallel("moduleCode", gulp.series("compileNoModuleCode", "noModuleCode")));

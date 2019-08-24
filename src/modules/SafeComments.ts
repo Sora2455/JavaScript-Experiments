@@ -241,7 +241,7 @@ interface ICommentData {
                 // And that we don't send referer info when we do so
                 "<meta name=\"referrer\" content=\"no-referrer\">" +
                 // Finally, set our comment stylesheet
-                "<link rel=\"stylesheet\" href=\"./safeComments.css\">" +
+                "<link rel=\"stylesheet\" href=\"safeComments.css\">" +
             "</head><body>" +
                 commentHtml +
                 // We use this data element to tell when the iframe has fully loaded
