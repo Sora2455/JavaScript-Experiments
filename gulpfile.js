@@ -54,6 +54,9 @@ gulp.task("newModules", function(){
                     removeComments: true,
                     sourceMap: false
                 }))
+                //Use absolute URLs instead of relative ones so that the cache-busting code
+                //can find them
+                .pipe(replace('"./', '"/modules/modules/'))
                 .pipe(uglify(newModuleOptions))
                 .pipe(sourcemaps.write("./"))
                 .pipe(gulp.dest("build/modules/modules"));
@@ -83,6 +86,9 @@ gulp.task("moduleCode", gulp.series("newModules", function(){
                     removeComments: true,
                     sourceMap: false
                 }))
+                //Use absolute URLs instead of relative ones so that the cache-busting code
+                //can find them
+                .pipe(replace('"./', '"/modules/'))
                 .pipe(uglify(newModuleOptions))
                 .pipe(sourcemaps.write("./"))
                 .pipe(gulp.dest("build/modules"));
@@ -496,9 +502,9 @@ gulp.task("fullClean", function() {
     return del("build");
 });
 
-gulp.task("build", gulp.series("cleanScripts", gulp.parallel("html", "scripts"), "css", "cacheBust"));
+gulp.task("build", gulp.series("cleanScripts", gulp.parallel("html", "scripts"), "css"));
 
-gulp.task("fullBuild", gulp.series("fullClean", gulp.parallel("scripts", gulp.series("generate-favicon", "html", "media")), "css", "cacheBust"));
+gulp.task("fullBuild", gulp.series("fullClean", gulp.parallel("scripts", gulp.series("html", "media")), "css", "cacheBust"));
 
 gulp.task("watch", function () {
     gulp.watch("src/*.ts", gulp.parallel("moduleCode", gulp.series("compileNoModuleCode", "noModuleCode")));
