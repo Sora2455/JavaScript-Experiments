@@ -153,4 +153,5 @@ function shareCurrentPage() {
     const canonicalUrlElem = document.querySelector("link[rel=canonical]") as HTMLLinkElement;
     const url = canonicalUrlElem ? canonicalUrlElem.href : location.href;
     navigator.share({title, url});
+    // TODO page description as text?
 }
