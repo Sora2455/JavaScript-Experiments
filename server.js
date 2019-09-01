@@ -41,8 +41,9 @@ server.listen(8080, function (err, address) {
 
 function setHeaders(res, path, stat){
     if (path.endsWith(".html")) {
-        res.setHeader("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; object-src 'none'; " +
-            "base-uri 'self'; form-action 'self'; frame-ancestors 'self'");
+        res.setHeader("Content-Security-Policy", "default-src 'self'; img-src 'self' data: https://img.youtube.com; " +
+            "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; " +
+            "frame-src 'self' https://www.youtube.com;");
         res.setHeader("Referrer-Policy", "same-origin");
         res.setHeader("Feature-Policy", "sync-xhr 'none'; document-write 'none'; vertical-scroll 'none'; " +
             "sync-script 'none'; image-compression 'none'; legacy-image-formats 'none'; " +

@@ -283,6 +283,34 @@ function addShareWidget() {
             </page-share>`;
 }
 
+/**
+ * Adds a simple, no JS YouTube widget that only loads an image until clicked on
+ */
+function addLazyYouTube(element) {
+    const codeRegex = /code="(.+?)"/;
+    // TODO what if the title has a double or single quote?
+    const titleRegex = /title="(.+?)"/;
+    const videoCode = element.match(codeRegex)[1];
+    const videoTitle = element.match(titleRegex)[1];
+    return `<iframe ` +
+                `width="560" ` +
+                `height="315" ` +
+                `loading="lazy" ` +
+                `lazyload="1" ` +
+                `referrerpolicy="no-referrer" ` +
+                `src="https://www.youtube.com/embed/${videoCode}" ` +
+                `srcdoc="<link rel='stylesheet' href='lazyYouTube.css' /> ` +
+                `<a href=https://www.youtube.com/embed/${videoCode}?autoplay=1> ` +
+                    `<img src=https://img.youtube.com/vi/${videoCode}/hqdefault.jpg ` +
+                        `alt='Video ${videoTitle}'> ` +
+                    `<span>▶</span> ` +
+                `</a>" ` +
+                `frameborder="0" ` +
+                `allow="autoplay; encrypted-media; fullscreen; picture-in-picture" ` +
+                `allowfullscreen ` +
+                `title="${videoTitle}"></iframe>`;
+}
+
 gulp.task("html", function() {
     const replacer = new MathMlReplacer({
         formatName: "TeX",
@@ -294,6 +322,7 @@ gulp.task("html", function() {
                 .pipe(replace("/src/", "/"))
                 .pipe(replace("[[origin]]", origin))
                 .pipe(replace("<page-share></page-share>", addShareWidget))
+                .pipe(replace(/<lazy-youtube(.+?)\/>/g, addLazyYouTube))
                 .pipe(realFavicon.injectFaviconMarkups(JSON.parse(fs.readFileSync(FAVICON_DATA_FILE)).favicon.html_code))
                 .pipe(htmlmin({
                     collapseWhitespace: true,
