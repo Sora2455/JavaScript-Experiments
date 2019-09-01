@@ -210,7 +210,7 @@ interface ICommentData {
                     comments = [{text: comments}];
                 }
             }
-            const commentHtml = comments.map((c, i) => {// TODO author and microdata
+            const commentHtml = comments.map((c, i) => {
                 const date = typeof c.date === "number" ? new Date(c.date) : null;
                 return  "<input type=\"checkbox\" id=\"readMoreCheckbox" + i + "\" hidden class=\"readMoreCheckbox\">" +
                         "<section class=\"comment\" dir=\"auto\" itemscope=\"\"" +
@@ -226,8 +226,9 @@ interface ICommentData {
                            "<div class=\"contents\" tabindex=\"0\">" +
                                this.stripStylesScriptsAndExternalResources(c.text) +
                            "</div>" +
-                           "<label class=\"readMore\" aria-hidden=\"true\" for=\"readMoreCheckbox" + i +
-                               "\">Read more...</label>" +
+                           "<label class=\"readMore\" aria-hidden=\"true\" for=\"readMoreCheckbox" + i + "\">" +
+                               "Read more..." +
+                           "</label>" +
                        "</section>";
             }).join("\n");
 
