@@ -26,6 +26,7 @@ const exec = require("child_process").exec;
 const realFavicon = require("gulp-real-favicon");
 const bust = require("gulp-buster");
 const fs = require("fs");
+const autoprefixer = require('autoprefixer');
 
 // File where the favicon markups are stored
 const FAVICON_DATA_FILE = "src/favicon/faviconData.json";
@@ -474,6 +475,7 @@ gulp.task("css", function() {
                     uncss({
                         html: ["build/*.html"]
                     }),
+                    autoprefixer(),
                     cssnano()
                 ]))
                 .pipe(sourcemaps.write("./"))

@@ -4,6 +4,7 @@
   "description": "Testing TypeScript, Gulp, and other JS frameworks",
   "license": "MIT",
   "dependencies": {
+    "autoprefixer": "^9.6.1",
     "browserify": "^16.5.0",
     "canvas": "^1.6.13",
     "cssnano": "^4.1.4",

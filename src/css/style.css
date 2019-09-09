@@ -28,11 +28,7 @@ body {
         /* Linux emoji */ "Noto Color Emoji"; /* 2 */
 
     line-height: 1.15; /* 3 */
-    -ms-text-size-adjust: 100%; /* 4 */ /* stylelint-disable-line */
-    -webkit-text-size-adjust: 100%; /* 4 */ /* stylelint-disable-line */
     text-size-adjust: 100%; /* 4 */ /* stylelint-disable-line */
-    -ms-hyphens: auto; /* 5 */ /* stylelint-disable-line */
-    -webkit-hyphens: auto; /* 5 */ /* stylelint-disable-line */
     hyphens: auto; /* 5 */ /* stylelint-disable-line */
 }
 
@@ -104,8 +100,7 @@ a {
 }
 
 /*
- * 1. Remove the tapping delay in IE 10.
- * 2. Remove the tapping delay on clickable elements
+ * 1. Remove the tapping delay on clickable elements
       in all browsers (opinionated).
  */
 a,
@@ -117,8 +112,7 @@ select,
 summary,
 textarea,
 [tabindex] {
-    -ms-touch-action: manipulation; /* 1 */ /* stylelint-disable-line */
-    touch-action: manipulation; /* 2 */ /* stylelint-disable-line */
+    touch-action: manipulation; /* 1 */ /* stylelint-disable-line */
 }
 
 /**
