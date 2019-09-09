@@ -100,8 +100,8 @@ a {
 }
 
 /*
- * 1. Remove the tapping delay on clickable elements
-      in all browsers (opinionated).
+ * Remove the tapping delay on clickable elements
+ * in all browsers (opinionated).
  */
 a,
 area,
@@ -112,7 +112,7 @@ select,
 summary,
 textarea,
 [tabindex] {
-    touch-action: manipulation; /* 1 */ /* stylelint-disable-line */
+    touch-action: manipulation; /* stylelint-disable-line */
 }
 
 /**
@@ -183,7 +183,7 @@ main section:last-of-type { /* stylelint-disable-line */
     height: calc(100vh - 4rem); /* stylelint-disable-line */
 }
 
-/* But hide it once another one is selected */
+/* ...but hide it once another one is selected */
 main section:target ~ section { /* stylelint-disable-line */
     height: 0;
 }
