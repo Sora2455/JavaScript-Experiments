@@ -75,6 +75,5 @@ main section iframe.section {
 
 /* uncss:ignore */
 #QRCodeResult td {
-    -webkit-print-color-adjust: exact;
     color-adjust: exact;
 }
