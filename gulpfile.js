@@ -258,6 +258,21 @@ const responsiveImageConfig = [{
 }];
 
 /**
+ * Adds a warning to outdated and JavaScript-disabled browsers as to why parts of the page don't work.
+ * @param {String} element The 'element' we are replacing
+ * @param {String} description The action the custom element allows (e.g. view comments)
+ */
+function addCustomElementWarning(element, description) {
+    return `<p class="hide-if-custom-elements-supported">` +
+                `Unfortunately, your browser does not support the technology required to ${description}. ` +
+                `Please <a href="https://bestvpn.org/outdatedbrowser">update your browser</a>.`+
+            `</p>` +
+            `<noscript hidden class="show-if-custom-elements-supported">` +
+                `<p>Please <a href="https://enable-javascript.com/">enable javascript</a> to ${description}.<p>` +
+            `</noscript>`;
+}
+
+/**
  * Adds a simple, no JS widget for sharing the current page on social media.
  * The localisation module, if loaded, will attempt to replace this with the Web Share API.
  */
@@ -322,6 +337,7 @@ gulp.task("html", function() {
                 .pipe(replacer)
                 .pipe(replace("/src/", "/"))
                 .pipe(replace("[[origin]]", origin))
+                .pipe(replace(/<custom-element-warning>(.+?)<\/custom-element-warning>/g, addCustomElementWarning))
                 .pipe(replace("<page-share></page-share>", addShareWidget))
                 .pipe(replace(/<lazy-youtube(.+?)\/>/g, addLazyYouTube))
                 .pipe(realFavicon.injectFaviconMarkups(JSON.parse(fs.readFileSync(FAVICON_DATA_FILE)).favicon.html_code))
