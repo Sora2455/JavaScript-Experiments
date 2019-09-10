@@ -51,7 +51,7 @@ hr {
     color: inherit;
     height: 0;
     overflow: visible;
-  }
+}
 
 /* Switch to using rem units for typography. Fix line-height on headlines. */
 h1 {
