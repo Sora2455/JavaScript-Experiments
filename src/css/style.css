@@ -40,14 +40,18 @@ body {
     box-sizing: inherit;
 }
 
-/**
- * 1. Add the correct sizing in Firefox.
- * 2. Show the overflow in Edge and IE.
- */
+/*
+* 1. Solid, thin horizonatal rules
+* 2. Remove Firefox `color: gray`
+* 3. Remove default `1px` height, and common `overflow: hidden`
+*/
 hr {
-    height: 0; /* 1 */
-    overflow: visible; /* 2 */
-}
+    border-style: solid;
+    border-width: 1px 0 0;
+    color: inherit;
+    height: 0;
+    overflow: visible;
+  }
 
 /* Switch to using rem units for typography. Fix line-height on headlines. */
 h1 {
