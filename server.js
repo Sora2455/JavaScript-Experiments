@@ -22,6 +22,8 @@ server.register(compression);
 server.get("/qrCode.png", handleDynamicImages);
 // serve comment JSON
 server.get("/comments.json", getCommentData);
+// test reflection endpoint
+server.get("/reflect.json", reflectJson);
 // serve static files
 server.register(serveStatic,
 {
@@ -115,6 +117,12 @@ function drawQrCode(reply, codeString) {
 
     const stream = image.pngStream();
     reply.send(stream);
+}
+
+function reflectJson(req, reply) {
+    reply.header("Cross-Origin-Resource-Policy", "same-site");
+    reply.type('application/json');
+    reply.send(req.body);
 }
 
 function getCommentData(req, reply){

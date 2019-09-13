@@ -127,6 +127,25 @@ gulp.task("noModuleCode", function() {
       }));
 });
 
+gulp.task("compileServiceWorkerCode", function() {
+    return gulp.src("src/serviceWorker/*.ts")
+                .pipe(sourcemaps.init({loadMaps: true}))
+                .pipe(ts({
+                    noImplicitAny: true,
+                    target: "es6",
+		            module: "es2015",
+                    removeComments: true,
+                    sourceMap: false,
+                    lib: [
+                        "webworker",
+                        "es6",
+                        "scripthost"
+                    ]
+                }))
+                .pipe(sourcemaps.write("./"))
+                .pipe(gulp.dest("build/workers"));
+});
+
 gulp.task("compileWorkerCode", function() {
     return gulp.src("src/workers/*.ts")
                 .pipe(sourcemaps.init({loadMaps: true}))
@@ -148,7 +167,7 @@ gulp.task("compileWorkerCode", function() {
                 .pipe(gulp.dest("build/workers"));
 });
 
-gulp.task("workerCode", gulp.series("compileWorkerCode", function() {
+gulp.task("workerCode", gulp.series("compileWorkerCode", "compileServiceWorkerCode", function() {
     const files = glob.sync("build/workers/*.js");
     return merge(files.map(function(file) {
         return browserify({
@@ -557,6 +576,7 @@ gulp.task("watch", function () {
     gulp.watch("src/*.ts", gulp.parallel("moduleCode", gulp.series("compileNoModuleCode", "noModuleCode")));
     gulp.watch("src/modules/*.ts", gulp.parallel("newModules", gulp.series("compileNoModuleCode", "noModuleCode")));
     gulp.watch("src/workers/*.ts", gulp.series("compileNoModuleCode", "workerCode"));
+    gulp.watch("src/serviceWorker/*.ts", gulp.series("workerCode"));
     gulp.watch("src/polyfills/es3/*.ts", gulp.series("polyfillsEs3"));
     gulp.watch("src/polyfills/es5/*.ts", gulp.series("polyfillsEs5"));
     gulp.watch("src/*/*.css", gulp.series("css"));
