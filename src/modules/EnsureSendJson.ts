@@ -303,16 +303,18 @@ function trySendOutbox(): void {
         openDb((db) => {
             const transaction = db.transaction(tableName, "readonly");
             const objectStore = transaction.objectStore(tableName);
-            const getAllRequest = objectStore.getAll();
-
-            getAllRequest.onsuccess = () => {
-                getAllRequest.result.forEach((call: IPendingSend) => {
+            objectStore.openCursor().onsuccess = function() {
+                const cursor = this.result;
+                const call = cursor && cursor.value;
+                // Iterate over each value
+                if (call) {
                     // Attempt to re-send each call
                     sendJson(call.endpoint, call.jsonString, false, (result, status) => {
                         // If the call succeeded, we can remove the outbox record
                         confirmRecordSent(call.id, result, status);
                     });
-                });
+                    cursor.continue();
+                }
             };
         });
     }

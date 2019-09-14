@@ -35,7 +35,7 @@ function getPendingSends(db: IDBDatabase): Promise<IPendingSend[]> {
         const transaction = db.transaction(tableName, "readonly");
         const objectStore = transaction.objectStore(tableName);
         const getAllRequest = objectStore.getAll();
-
+        // TODO change to use a cursor instead
         getAllRequest.onsuccess = () => {
             resolve(getAllRequest.result);
         };
