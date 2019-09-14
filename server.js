@@ -23,7 +23,7 @@ server.get("/qrCode.png", handleDynamicImages);
 // serve comment JSON
 server.get("/comments.json", getCommentData);
 // test reflection endpoint
-server.get("/reflect.json", reflectJson);
+server.post("/reflect.json", reflectJson);
 // serve static files
 server.register(serveStatic,
 {
@@ -122,6 +122,7 @@ function drawQrCode(reply, codeString) {
 function reflectJson(req, reply) {
     reply.header("Cross-Origin-Resource-Policy", "same-site");
     reply.type('application/json');
+    console.log(req.body);
     reply.send(req.body);
 }
 
