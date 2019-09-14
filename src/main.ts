@@ -1,4 +1,5 @@
 import {AutoCompleteSearch} from "./modules/AutoComplete.js";
+import {postJson} from "./modules/EnsureSendJson.js";
 import "./modules/LazyLoad.js";
 import "./modules/Localiser.js";
 import {onBuyClicked} from "./modules/PaymentRequest.js";
@@ -48,6 +49,26 @@ readyManager.whenReady({
         }
     },
     requirements: [Requirement.datalist]
+});
+if (navigator.serviceWorker) {
+    navigator.serviceWorker.register("serviceWorker.js");
+}
+readyManager.whenReady(() => {
+    const jsonSendButton = document.getElementById("testSendJson");
+    const jsonSendResult = document.getElementById("testSendJsonResult");
+    const jsonData = {a: 1, b: "c"};
+    const jsonString = JSON.stringify(jsonData);
+    if (jsonSendButton && jsonSendResult) {
+        jsonSendButton.onclick = () => {
+            jsonSendResult.innerText = "";
+            postJson("/reflect.json", jsonString, (result, statusCode) => {
+                const success = statusCode === 200 &&
+                    typeof result === "object" &&
+                    result.a === 1 && result.b === "c";
+                jsonSendResult.innerText = success.toString();
+            });
+        }
+    }
 });
 const printManager = new PrintManager();
 printManager.RunBeforePrint(() => {
