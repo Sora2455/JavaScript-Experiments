@@ -144,7 +144,7 @@ gulp.task("compileServiceWorkerCode", function() {
                     ]
                 }))
                 .pipe(sourcemaps.write("./"))
-                .pipe(gulp.dest("build/workers"));
+                .pipe(gulp.dest("build"));
 });
 
 gulp.task("compileWorkerCode", function() {

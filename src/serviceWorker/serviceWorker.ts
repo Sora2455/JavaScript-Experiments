@@ -1,1 +1,1 @@
-importScripts("/ensureSendJsonSw.js");
+importScripts("workers/ensureSendJsonSw.min.js");
