@@ -56,7 +56,7 @@ if (navigator.serviceWorker) {
 readyManager.whenReady(() => {
     const jsonSendButton = document.getElementById("testSendJson");
     const jsonSendResult = document.getElementById("testSendJsonResult");
-    const jsonData = {a: 1, b: "c"};
+    const jsonData = {a: Math.random(), b: Math.random().toString(36).substring(7)};
     const jsonString = JSON.stringify(jsonData);
     if (jsonSendButton && jsonSendResult) {
         jsonSendButton.onclick = () => {
@@ -64,8 +64,11 @@ readyManager.whenReady(() => {
             postJson("/reflect.json", jsonString, (result, statusCode) => {
                 const success = statusCode === 200 &&
                     typeof result === "object" &&
-                    result.a === 1 && result.b === "c";
-                jsonSendResult.innerText = success.toString();
+                    result.a === jsonData.a &&
+                    result.b === jsonData.b;
+                jsonSendResult.innerText = success ?
+                    "matches" :
+                    `Status code: ${statusCode}, result: ${JSON.stringify(result)}`;
             });
         }
     }
