@@ -122,7 +122,6 @@ function drawQrCode(reply, codeString) {
 function reflectJson(req, reply) {
     reply.header("Cross-Origin-Resource-Policy", "same-site");
     reply.type('application/json');
-    console.log(req.body);
     reply.send(req.body);
 }
 
