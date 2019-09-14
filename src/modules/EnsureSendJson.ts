@@ -295,7 +295,9 @@ function trySendOutbox(): void {
 
     if (self.navigator.serviceWorker) {
         // If possible, let the service worker handle this (as then we avoid multi-thread issues)
-        self.navigator.serviceWorker.controller.postMessage(syncTag);
+        self.navigator.serviceWorker.ready.then((reg) => {
+            reg.active.postMessage(syncTag);
+        });
     } else if (supportsIndexedDb) {
         // Otherwise we have to hope that we are the only tab open for this origin
         openDb((db) => {
