@@ -35,7 +35,8 @@ const configJson = JSON.parse(fs.readFileSync("config.json"));
 ffmpeg.setFfmpegPath(configJson.ffmpegPath);
 ffmpeg.setFfprobePath(configJson.ffprobePath);
 const origin = configJson.origin;
-const gifConvertOptions = "[0:v] fps=12,scale=320:-1:flags=lanczos,split [a][b];[a] palettegen [p];[b][p] paletteuse";
+const gifConvertOptions = "[0:v] fps=12,scale=320:-1:flags=lanczos," +
+    "split [a][b];[a] palettegen [p];[b][p] paletteuse";
 
 const polyfillRegex = /\/\/ startpolyfill[\s\S]*?\/\/ endpolyfill/g;
 const noPolyfillRegex = /\/\/ startnopolyfill[\s\S]*?\/\/ endnopolyfill/g;
@@ -305,10 +306,12 @@ function addShareWidget() {
                 <p><a href="https://www.facebook.com/sharer.php?u=${filePath}" target="socialWindow">
                     Share on Facebook
                 </a></p>
-                <p><a href="https://twitter.com/intent/tweet?url=${filePath}&text=${tweetText}" target="socialWindow">
+                <p><a href="https://twitter.com/intent/tweet?url=${filePath}&text=${tweetText}"
+                      target="socialWindow">
                     Share on Twitter
                 </a></p>
-                <p><a href="https://www.linkedin.com/shareArticle?mini=true&url=${filePath}" target="socialWindow">
+                <p><a href="https://www.linkedin.com/shareArticle?mini=true&url=${filePath}" 
+                      target="socialWindow">
                     Share on LinkedIn
                 </a></p>
                 <p><a href="mailto:?body=${filePath}">
@@ -356,10 +359,14 @@ gulp.task("html", function() {
                 .pipe(replacer)
                 .pipe(replace("/src/", "/"))
                 .pipe(replace("[[origin]]", origin))
-                .pipe(replace(/<custom-element-warning>(.+?)<\/custom-element-warning>/g, addCustomElementWarning))
+                .pipe(replace(/<custom-element-warning>(.+?)<\/custom-element-warning>/g,
+                    addCustomElementWarning))
                 .pipe(replace("<page-share></page-share>", addShareWidget))
                 .pipe(replace(/<lazy-youtube(.+?)\/>/g, addLazyYouTube))
-                .pipe(realFavicon.injectFaviconMarkups(JSON.parse(fs.readFileSync(FAVICON_DATA_FILE)).favicon.html_code))
+                .pipe(realFavicon.injectFaviconMarkups(
+                    JSON.parse(
+                        fs.readFileSync(FAVICON_DATA_FILE)
+                    ).favicon.html_code))
                 .pipe(htmlmin({
                     collapseWhitespace: true,
                     conservativeCollapse: true
@@ -570,13 +577,14 @@ gulp.task("fullClean", function() {
 
 gulp.task("build", gulp.series("cleanScripts", gulp.parallel("html", "scripts"), "css"));
 
-gulp.task("fullBuild", gulp.series("fullClean", gulp.parallel("scripts", gulp.series("generate-favicon", "html", "media")), "css", "cacheBust"));
+gulp.task("fullBuild", gulp.series("fullClean", gulp.parallel("scripts",
+    gulp.series("generate-favicon", "html", "media")), "css", "cacheBust"));
 
 gulp.task("watch", function () {
     gulp.watch("src/*.ts", gulp.parallel("moduleCode", gulp.series("compileNoModuleCode", "noModuleCode")));
     gulp.watch("src/modules/*.ts", gulp.parallel("newModules", gulp.series("compileNoModuleCode", "noModuleCode")));
-    gulp.watch("src/workers/*.ts", gulp.series("compileNoModuleCode", "workerCode"));
-    gulp.watch("src/serviceWorker/*.ts", gulp.series("workerCode"));
+    gulp.watch("src/workers/*.ts", gulp.series("cleanWorkers", "compileNoModuleCode", "workerCode"));
+    gulp.watch("src/serviceWorker/*.ts", gulp.series("cleanWorkers", "workerCode"));
     gulp.watch("src/polyfills/es3/*.ts", gulp.series("polyfillsEs3"));
     gulp.watch("src/polyfills/es5/*.ts", gulp.series("polyfillsEs5"));
     gulp.watch("src/*/*.css", gulp.series("css"));
