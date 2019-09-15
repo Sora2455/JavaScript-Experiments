@@ -56,10 +56,10 @@ if (navigator.serviceWorker) {
 readyManager.whenReady(() => {
     const jsonSendButton = document.getElementById("testSendJson");
     const jsonSendResult = document.getElementById("testSendJsonResult");
-    const jsonData = {a: Math.random(), b: Math.random().toString(36).substring(7)};
-    const jsonString = JSON.stringify(jsonData);
     if (jsonSendButton && jsonSendResult) {
         jsonSendButton.onclick = () => {
+            const jsonData = {a: Math.random(), b: Math.random().toString(36).substring(7)};
+            const jsonString = JSON.stringify(jsonData);
             jsonSendResult.innerText = "";
             postJson("/reflect.json", jsonString, (result, statusCode) => {
                 const success = statusCode === 200 &&
@@ -70,7 +70,7 @@ readyManager.whenReady(() => {
                     "matches" :
                     `Status code: ${statusCode}, result: ${JSON.stringify(result)}`;
             });
-        }
+        };
     }
 });
 const printManager = new PrintManager();
