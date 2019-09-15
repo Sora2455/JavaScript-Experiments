@@ -68,6 +68,7 @@ function openDb(openCallback?: (db: IDBDatabase) => void,
                 errorCallback?: () => void): void {
     if (dbConnection instanceof IDBDatabase) {
         openCallback(dbConnection);
+        return;
     }
     const openRequest = self.indexedDB.open(dataBaseName, 1);
     if (errorCallback) {
