@@ -9,7 +9,7 @@
     "canvas": "^1.6.13",
     "cssnano": "^4.1.4",
     "del": "^3.0.0",
-    "fastify": "^2.7.1",
+    "fastify": "^2.8.0",
     "fastify-compress": "^0.8.1",
     "fastify-static": "^2.5.0",
     "glob": "^7.1.4",
@@ -28,7 +28,7 @@
     "math-ml-now": "^2.0.2",
     "merge-stream": "^1.0.1",
     "path": "^0.12.7",
-    "typescript": "^3.5.3",
+    "typescript": "^3.6.3",
     "uglify-es": "^3.3.10",
     "uncss": "^0.16.2",
     "vinyl-buffer": "^1.0.1",
@@ -39,15 +39,15 @@
     "chromedriver": "^2.46.0",
     "edgedriver": "^4.17134.1",
     "fluent-ffmpeg": "^2.1.2",
-    "geckodriver": "^1.16.2",
+    "geckodriver": "^1.17.0",
     "gulp-real-favicon": "^0.3.2",
     "iedriver": "^3.14.1",
     "mocha": "^5.2.0",
-    "selenium-webdriver": "^4.0.0-alpha.4",
+    "selenium-webdriver": "^4.0.0-alpha.5",
     "stylelint": "^9.10.1",
     "stylelint-config-standard": "^18.3.0",
     "stylelint-no-unsupported-browser-features": "^3.0.2",
-    "tslint": "^5.18.0"
+    "tslint": "^5.20.0"
   },
   "scripts": {
     "test": "mocha"
