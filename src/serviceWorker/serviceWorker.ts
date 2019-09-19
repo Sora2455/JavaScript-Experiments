@@ -46,7 +46,7 @@ function installHander(e: ExtendableEvent): void {
                     .then((response) => core.put(key, response));
             }))
             // Don't wait for the client to refresh the page (as this site is designed not to refresh)
-            .then(() => (self as ServiceWorkerGlobalScope).skipWaiting());
+            .then(() => (self as unknown as ServiceWorkerGlobalScope).skipWaiting());
         });
     }));
 }
@@ -60,7 +60,7 @@ function activationHander(e: ExtendableEvent): void {
     // Copy the newly installed cache to the active cache
     e.waitUntil(cacheCopy("core-waiting", "core")
         // Declare that we'll be taking over now
-        .then(() => (self as ServiceWorkerGlobalScope).clients.claim())
+        .then(() => (self as unknown as ServiceWorkerGlobalScope).clients.claim())
         // Delete the waiting cache afterward to save client memory space
         .then(() => caches.delete("core-waiting")));
 }

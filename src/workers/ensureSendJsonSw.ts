@@ -70,7 +70,7 @@ async function sendPendingJson(): Promise<void> {
             const status = result.status;
             const resultJson = await result.json();
             await deletePendingSend(db, send.id);
-            const clients = await (self as ServiceWorkerGlobalScope).clients.matchAll();
+            const clients = await (self as unknown as ServiceWorkerGlobalScope).clients.matchAll();
             clients.forEach((client) => {
                 client.postMessage({
                     id: send.id,
