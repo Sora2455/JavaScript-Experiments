@@ -34,7 +34,7 @@ const storageKey = "sendJSON-outbox";
 let dbConnection: IDBDatabase;
 const supportsIndexedDb = typeof indexedDB === "object";
 const supportsSyncManager = typeof SyncManager === "function";
-const commitSupport = typeof IDBTransaction.prototype.commit === "function";
+const commitSupport = typeof IDBTransaction === "function" && typeof IDBTransaction.prototype.commit === "function";
 
 /**
  * Send JSON to the given endpoint, regardless if we are offline or if the page is unloading
@@ -378,7 +378,9 @@ if (self.navigator.serviceWorker) {
 }
 
 // Begin opening the DB connection right away so that we can use it when the page unloads
-openDb();
+if (supportsIndexedDb) {
+    openDb();
+}
 
 if (!supportsSyncManager) {
     // For users that don't have background sync, try sending if
@@ -388,7 +390,7 @@ if (!supportsSyncManager) {
     (new ReadyManager()).whenLoaded(trySendOutbox);
 }
 
-if (self.document) {
+if (self.document && supportsIndexedDb) {
     self.document.addEventListener("freeze", () => {
         // If the document is being frozen, close our DB connection (if it was opened successfully)
         if (dbConnection instanceof IDBDatabase) {
