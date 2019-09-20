@@ -25,7 +25,6 @@
     "gulp-typescript": "^5.0.0-alpha.3",
     "gulp-uglify": "^3.0.1",
     "imagemin-webp": "^5.1.0",
-    "math-ml-now": "^2.0.2",
     "merge-stream": "^1.0.1",
     "path": "^0.12.7",
     "typescript": "^3.6.3",

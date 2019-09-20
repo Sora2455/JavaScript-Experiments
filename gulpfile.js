@@ -18,7 +18,6 @@ const buffer = require("vinyl-buffer");
 const merge = require("merge-stream");
 const glob = require("glob");
 const path = require("path");
-const {MathMlReplacer} = require("math-ml-now");
 const imagemin = require("gulp-imagemin");
 const imageminWebp = require("imagemin-webp");
 const ffmpeg = require("fluent-ffmpeg");
@@ -350,13 +349,7 @@ function addLazyYouTube(element) {
 }
 
 gulp.task("html", function() {
-    const replacer = new MathMlReplacer({
-        formatName: "TeX",
-        imageFolder: "/src/media/"
-    });
-
     return gulp.src("src/html/*.html")
-                .pipe(replacer)
                 .pipe(replace("/src/", "/"))
                 .pipe(replace("[[origin]]", origin))
                 .pipe(replace(/<custom-element-warning>(.+?)<\/custom-element-warning>/g,
