@@ -6,7 +6,6 @@
   "dependencies": {
     "autoprefixer": "^9.6.1",
     "browserify": "^16.5.0",
-    "canvas": "^1.6.13",
     "cssnano": "^4.1.4",
     "del": "^3.0.0",
     "fastify": "^2.8.0",
@@ -28,6 +27,7 @@
     "merge-stream": "^1.0.1",
     "path": "^0.12.7",
     "postcss-remove-unused-css": "^1.0.4",
+    "pureimage": "^0.1.6",
     "typescript": "^3.6.3",
     "uglify-es": "^3.3.10",
     "vinyl-buffer": "^1.0.1",

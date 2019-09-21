@@ -4,7 +4,7 @@ const path = require('path');
 const fastify = require('fastify');
 const compression = require('fastify-compress');
 const serveStatic = require('fastify-static');
-const Canvas = require('canvas');
+const PImage = require('pureimage');
 const qrCode = require("./build/noModules/modules/QRCodeRenderer");
 
 let ieVersion = "edge";
@@ -12,6 +12,7 @@ let ieVersion = "edge";
 const server = fastify({
     http2: true,
     https: {
+        allowHTTP1: true, // fallback support for HTTP1
         pfx: fs.readFileSync(path.join(__dirname, 'https', 'testingCert.pfx')),
         passphrase: "testingCert"
     }
@@ -84,9 +85,8 @@ function handleDynamicImages (req, reply) {
 }
 
 function return1x1pxPng(reply) {
-    const image = new Canvas(1, 1);
-    const stream = image.pngStream();
-    reply.send(stream);
+    const image = PImage.make(1, 1);
+    PImage.encodePNGToStream(image, reply.res);
 }
 
 function setNoCache(res) {
@@ -103,7 +103,7 @@ function drawQrCode(reply, codeString) {
     const imageSize = 360;
     const cellSize = imageSize / nCount;
 
-    const image = new Canvas(imageSize, imageSize);
+    const image = PImage.make(imageSize, imageSize);
     const ctx = image.getContext("2d");
 
     for (let row = 0; row < nCount; row++) {
@@ -115,8 +115,7 @@ function drawQrCode(reply, codeString) {
         }
     }
 
-    const stream = image.pngStream();
-    reply.send(stream);
+    PImage.encodePNGToStream(image, reply.res);
 }
 
 function reflectJson(req, reply) {
@@ -134,7 +133,7 @@ function getCommentData(req, reply){
     // TODO in an actual implemention, fetch this from a database
     switch (pageId) {
         case "1":
-            reply.send([
+            reply.send([//TODO load from external source
 {
     author: "Some guy",
     date: (new Date(2019, 7, 10, 9, 35)).getTime(),
