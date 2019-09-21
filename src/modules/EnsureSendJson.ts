@@ -32,6 +32,7 @@ const messageEventType = "syncCompleted";
 const storageKey = "sendJSON-outbox";
 
 let dbConnection: IDBDatabase;
+const supportsStorageEvents = typeof self.onstorage !== "undefined";
 const supportsIndexedDb = typeof indexedDB === "object";
 const supportsSyncManager = typeof SyncManager === "function";
 const commitSupport = typeof IDBTransaction === "function" && typeof IDBTransaction.prototype.commit === "function";
@@ -333,8 +334,8 @@ function confirmRecordSent(id: number, result: any, statusCode: number) {
         const transaction = db.transaction(tableName, "readwrite");
         transaction.objectStore(tableName).delete(id);
     });
-    if (self.localStorage) {
-        // Use message events to let other tabs know (IE 10-11)
+    if (supportsStorageEvents) {
+        // Use message events to let other tabs know (IE 9-11)
         const sendResult = {id, result, statusCode} as ISendResult;
         self.localStorage.setItem(syncTag, JSON.stringify(sendResult));
         self.localStorage.removeItem(syncTag);
@@ -366,7 +367,7 @@ if (self.navigator.serviceWorker) {
             tryRunCallback(ev.data.id, ev.data.result, ev.data.statusCode);
         }
     });
-} else {
+} else if (supportsStorageEvents) {
     // Otherwise we have to use storage events becuase other tabs/windows might send our JSON
     // for us
     self.addEventListener("storage", (ev) => {
@@ -385,7 +386,13 @@ if (supportsIndexedDb) {
 if (!supportsSyncManager) {
     // For users that don't have background sync, try sending if
     // the internet reconnects while the page is still loaded
-    self.addEventListener("online", trySendOutbox);
+    // startpolyfill (compiler directive)
+    if (self.addEventListener) {
+        // endpolyfill
+        self.addEventListener("online", trySendOutbox);
+        // startpolyfill (compiler directive)
+    }
+    // endpolyfill
     // Or if the page has just loaded, try sending entries in the outbox now
     (new ReadyManager()).whenLoaded(trySendOutbox);
 }
