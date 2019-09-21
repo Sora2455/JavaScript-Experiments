@@ -536,12 +536,14 @@ function escapeRegExp(string) {
 
 gulp.task("implementResourceHashes", function() {
     const hashList = JSON.parse(fs.readFileSync("build/busters.json"));
-    const hashFileRegex = new RegExp(Object.keys(hashList).map(escapeRegExp).join("|"), "gi");
+    const hashListRegexSelector = Object.keys(hashList).map(escapeRegExp).join("|");
+                                    // Select all references to the files, except map files
+    const hashFileRegex = new RegExp(`(${hashListRegexSelector})(?!\.map)`, "gi");
     return gulp.src("build/**/*.{css,js,html}")
         .pipe(replace(hashFileRegex, function (match, p1) {
             return match + "?v=" + hashList[match];
         }))
-        .pipe(gulp.dest("build"));//TODO not map files
+        .pipe(gulp.dest("build"));
 });
 
 gulp.task("cacheBust", gulp.series("getResourceHashes", "implementResourceHashes"));
