@@ -387,7 +387,7 @@ gulp.task("silentVideos", function(done){
         const fileName = path.basename(filePath, path.extname(filePath));
         //If we've already generated this video, skip
         if (fs.existsSync(`build/media/${fileName}.webm`) &&
-            //fs.existsSync(`build/media/${fileName}.ogv`) &&
+            fs.existsSync(`build/media/${fileName}.ogv`) &&
             fs.existsSync(`build/media/${fileName}.gif`)) {
             return;
         }
@@ -397,10 +397,14 @@ gulp.task("silentVideos", function(done){
                 .noAudio()
                 .format("webm")
                 .videoCodec("libvpx")
-                //.output(`build/media/${fileName}.ogv`)
-                //.noAudio()
-                //.format("ogv")
-                //.videoCodec("libtheora")
+                .output(`build/media/${fileName}.ogv`)
+                .noAudio()
+                .format("ogv")
+                .videoCodec("libtheora")
+                .outputOptions([
+                    "-g 1",
+                    "-qscale 1"
+                ])
                 .output(`build/media/${fileName}.gif`)
                 .outputOptions("-vf", gifConvertOptions)
                 .on("error", function(err, stdout, stderr) {
