@@ -27,9 +27,9 @@
     "imagemin-webp": "^5.1.0",
     "merge-stream": "^1.0.1",
     "path": "^0.12.7",
+    "postcss-remove-unused-css": "^1.0.4",
     "typescript": "^3.6.3",
     "uglify-es": "^3.3.10",
-    "uncss": "^0.16.2",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0"
   },

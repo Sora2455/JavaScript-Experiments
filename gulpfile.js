@@ -2,7 +2,7 @@
 const gulp = require("gulp");
 const postcss = require("gulp-postcss");
 const cssnano = require("cssnano");
-const uncss = require("uncss").postcssPlugin;
+const removeUnusedCss = require("postcss-remove-unused-css");
 const ts = require("gulp-typescript");
 const replace = require("gulp-replace");
 const extReplace = require("gulp-ext-replace");
@@ -507,8 +507,8 @@ gulp.task("css", function() {
     return gulp.src("src/css/*.css")
                 .pipe(sourcemaps.init({loadMaps: true}))
                 .pipe(postcss([
-                    uncss({
-                        html: ["build/*.html"]
+                    removeUnusedCss({
+                        path: "./build"
                     }),
                     autoprefixer(),
                     cssnano()
@@ -541,7 +541,7 @@ gulp.task("implementResourceHashes", function() {
         .pipe(replace(hashFileRegex, function (match, p1) {
             return match + "?v=" + hashList[match];
         }))
-        .pipe(gulp.dest("build"));
+        .pipe(gulp.dest("build"));//TODO not map files
 });
 
 gulp.task("cacheBust", gulp.series("getResourceHashes", "implementResourceHashes"));
