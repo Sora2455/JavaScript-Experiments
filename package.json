@@ -26,7 +26,6 @@
     "imagemin-webp": "^5.1.0",
     "merge-stream": "^1.0.1",
     "path": "^0.12.7",
-    "postcss-remove-unused-css": "^1.0.4",
     "pureimage": "^0.1.6",
     "typescript": "^3.6.3",
     "uglify-es": "^3.3.10",

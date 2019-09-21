@@ -2,7 +2,6 @@
 const gulp = require("gulp");
 const postcss = require("gulp-postcss");
 const cssnano = require("cssnano");
-const removeUnusedCss = require("postcss-remove-unused-css");
 const ts = require("gulp-typescript");
 const replace = require("gulp-replace");
 const extReplace = require("gulp-ext-replace");
@@ -507,9 +506,6 @@ gulp.task("css", function() {
     return gulp.src("src/css/*.css")
                 .pipe(sourcemaps.init({loadMaps: true}))
                 .pipe(postcss([
-                    removeUnusedCss({
-                        path: "./build"
-                    }),
                     autoprefixer(),
                     cssnano()
                 ]))
