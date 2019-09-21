@@ -570,7 +570,7 @@ gulp.task("fullClean", function() {
     return del("build");
 });
 
-gulp.task("build", gulp.series("cleanScripts", gulp.parallel("html", "scripts"), "css"));
+gulp.task("build", gulp.series("cleanScripts", gulp.parallel("html", "scripts"), "css", "cacheBust"));
 
 gulp.task("fullBuild", gulp.series("fullClean", gulp.parallel("scripts",
     gulp.series("generate-favicon", "html", "media")), "css", "cacheBust"));
