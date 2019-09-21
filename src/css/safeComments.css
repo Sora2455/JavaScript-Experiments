@@ -3,7 +3,6 @@ body {
     margin: 0;
 }
 
-/* uncss:ignore start */
 /* stylelint-disable */
 *,
 *::before,
@@ -20,7 +19,6 @@ body {
     --commentLinkVisitedColor: rgb(138, 0, 0);
 
     border: 1px solid red;
-    max-height: 12rem;/* stylelint-disable-line */
     background-color: var(--commentBackgroudColor);
     color: var(--commentFontColor);
     position: relative;
@@ -50,7 +48,7 @@ body {
 
 .comment > label.readMore {
     position: absolute;
-    top: 7.7rem;/* stylelint-disable-line */
+    top: 6rem;/* stylelint-disable-line */
     left: 0;
     width: 100%;
     text-align: center;
@@ -71,6 +69,7 @@ body {
 
 .comment .contents {
     max-height: 9rem;/* stylelint-disable-line */
+    overflow-y: hidden;
 }
 
 .comment:focus-within {

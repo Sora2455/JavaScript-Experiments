@@ -319,7 +319,7 @@ details h2 {
 /**
  * Correct the text style of placeholders in Chrome, Edge, and Safari.
  */
-::-webkit-input-placeholder {
+input::-webkit-input-placeholder {
     color: inherit;
     opacity: 0.54; /* stylelint-disable-line */
 }
