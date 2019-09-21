@@ -5,7 +5,7 @@ importScripts("workers/ensureSendJsonSw.min.js");
  * @param source The name of the cache to move from
  * @param destination The name of the cache to move into
  */
-async function cacheCopy(source: string, destination: string) {
+async function cacheCopy(source: string, destination: string): Promise<void[]> {
     "use strict";
     await caches.delete(destination);
     const results = await Promise.all([
