@@ -5,25 +5,21 @@ importScripts("workers/ensureSendJsonSw.min.js");
  * @param source The name of the cache to move from
  * @param destination The name of the cache to move into
  */
-function cacheCopy(source: string, destination: string) {
+async function cacheCopy(source: string, destination: string) {
     "use strict";
-    return caches.delete(destination).then(() => {
-        return Promise.all([
-            caches.open(source),
-            caches.open(destination)
-        ]).then((results) => {
-            const sourceCache = results[0];
-            const destCache = results[1];
-
-            return sourceCache.keys().then((requests: ReadonlyArray<Request>) => {
-                return Promise.all(requests.map((request) => {
-                    return sourceCache.match(request).then((response) => {
-                        return destCache.put(request, response);
-                    });
-                }));
-            });
+    await caches.delete(destination);
+    const results = await Promise.all([
+        caches.open(source),
+        caches.open(destination)
+    ]);
+    const sourceCache = results[0];
+    const destCache = results[1];
+    const requests = await sourceCache.keys();
+    return Promise.all(requests.map((request) => {
+        return sourceCache.match(request).then((response) => {
+            return destCache.put(request, response);
         });
-    });
+    }));
 }
 
 /**
