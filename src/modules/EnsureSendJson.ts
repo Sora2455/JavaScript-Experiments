@@ -398,16 +398,16 @@ if (!supportsSyncManager) {
 }
 
 if (self.document && supportsIndexedDb) {
-    self.document.addEventListener("freeze", () => {
-        // If the document is being frozen, close our DB connection (if it was opened successfully)
-        if (dbConnection instanceof IDBDatabase) {
-            dbConnection.close();
-            dbConnection = null;
+    self.document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") {
+            // Some other window/tab is in the foreground - close our DB connection
+            if (dbConnection instanceof IDBDatabase) {
+                dbConnection.close();
+                dbConnection = null;
+            }
+        } else {
+            // If the document is in view, open the DB connection again
+            openDb();
         }
-    });
-
-    self.document.addEventListener("resume", () => {
-        // If the document is being thawed out, open the DB connection again
-        openDb();
     });
 }
