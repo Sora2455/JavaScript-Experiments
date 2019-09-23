@@ -379,7 +379,7 @@ if (self.navigator.serviceWorker) {
 }
 
 // Begin opening the DB connection right away so that we can use it when the page unloads
-if (supportsIndexedDb) {
+if (supportsIndexedDb && self.document && self.document.visibilityState === "visible") {
     openDb();
 }
 
@@ -399,7 +399,7 @@ if (!supportsSyncManager) {
 
 if (self.document && supportsIndexedDb) {
     self.document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "hidden") {
+        if (self.document.visibilityState === "hidden") {
             // Some other window/tab is in the foreground - close our DB connection
             if (dbConnection instanceof IDBDatabase) {
                 dbConnection.close();
