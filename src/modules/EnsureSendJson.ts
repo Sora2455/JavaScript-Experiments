@@ -226,10 +226,15 @@ function sendJson(endpoint: string, jsonString: string, isUnloading: boolean,
             // We can't set callback on sendBeacon, so for consistency the fallback won't either
             if (callback && !isUnloading) {
                 xhr.onload = () => {
-                    if (xhr.responseText) {
-                        callback(JSON.parse(xhr.responseText), xhr.status);
-                    } else {
-                        callback(null, xhr.status);
+                    // If we get a status code outside the 200 range, something has gone wrong
+                    if (200 <= xhr.status && xhr.status < 300) {
+                        if (xhr.responseText) {
+                            callback(JSON.parse(xhr.responseText), xhr.status);
+                        } else {
+                            callback(null, xhr.status);
+                        }
+                    } else if (onError) {
+                        onError(xhr.status);
                     }
                 };
             }
