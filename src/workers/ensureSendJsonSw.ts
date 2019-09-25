@@ -12,7 +12,6 @@ const messageEventType = "syncCompleted";
 
 /**
  * Open a connection to the pending JSON database as a Promise
- * TODO: make this part an imported script
  */
 function openPendingJsonDb(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
@@ -30,19 +29,27 @@ function openPendingJsonDb(): Promise<IDBDatabase> {
     });
 }
 
-function getPendingSends(db: IDBDatabase): Promise<IPendingSend[]> {
+/**
+ * Get the first pending send in the database
+ * @param db A IndexedDb connection to the pending send database
+ */
+function getPendingSend(db: IDBDatabase): Promise<IPendingSend> {
     return new Promise((resolve, reject) => {
         const transaction = db.transaction(tableName, "readonly");
         const objectStore = transaction.objectStore(tableName);
-        const getAllRequest = objectStore.getAll();
-        // TODO change to use a cursor instead
-        getAllRequest.onsuccess = () => {
-            resolve(getAllRequest.result);
+        const cursorRequest = objectStore.openCursor();
+        cursorRequest.onsuccess = () => {
+            resolve(cursorRequest.result && cursorRequest.result.value);
         };
-        getAllRequest.onerror = reject;
+        cursorRequest.onerror = reject;
     });
 }
 
+/**
+ * Delete a specific record from the pending send table
+ * @param db A IndexedDb connection to the pending send database
+ * @param id The ID of the pending send to delete
+ */
 function deletePendingSend(db: IDBDatabase, id: number): Promise<void> {
     return new Promise((resolve, reject) => {
         const transaction = db.transaction(tableName, "readwrite");
@@ -54,35 +61,36 @@ function deletePendingSend(db: IDBDatabase, id: number): Promise<void> {
     });
 }
 
+/**
+ * Send the pending JSON POSTs
+ */
 async function sendPendingJson(): Promise<void> {
     const db = await openPendingJsonDb();
-    const pendingSends = await getPendingSends(db);
-    const pendingSendPromises = pendingSends.map((send) => {
-        return async () => {
-            const result = await fetch(send.endpoint, {
-                body: send.jsonString,
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json, */*;q=0.5"
-                },
-                method: "POST"
+    let pendingSend = await getPendingSend(db);
+    while (pendingSend) {
+        const result = await fetch(pendingSend.endpoint, {
+            body: pendingSend.jsonString,
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json, */*;q=0.5"
+            },
+            method: "POST"
+        });
+        const status = result.status;
+        const resultJson = await result.json();
+        await deletePendingSend(db, pendingSend.id);
+        const clients = await (self as unknown as ServiceWorkerGlobalScope).clients.matchAll();
+        clients.forEach((client) => {
+            client.postMessage({
+                id: pendingSend.id,
+                result: resultJson,
+                statusCode: status,
+                type: messageEventType
             });
-            const status = result.status;
-            const resultJson = await result.json();
-            await deletePendingSend(db, send.id);
-            const clients = await (self as unknown as ServiceWorkerGlobalScope).clients.matchAll();
-            clients.forEach((client) => {
-                client.postMessage({
-                    id: send.id,
-                    result: resultJson,
-                    statusCode: status,
-                    type: messageEventType
-                });
-            });
-        };
-    });
-    // Run through the pending sends in the order we recieved them
-    await pendingSendPromises.reduce((prev, cur) => prev.then(cur), Promise.resolve());
+        });
+
+        pendingSend = await getPendingSend(db);
+    }
 }
 
 function onSync(ev: SyncEvent): void {
