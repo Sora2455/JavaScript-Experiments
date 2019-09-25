@@ -179,12 +179,12 @@ main section {
 
 /* Show the targeted section */
 main section:target { /* stylelint-disable-line */
-    height: calc(100vh - 4rem); /* stylelint-disable-line */
+    height: calc(100vh - 10rem); /* stylelint-disable-line */
 }
 
 /* Show the last section by default... */
 main section:last-of-type { /* stylelint-disable-line */
-    height: calc(100vh - 4rem); /* stylelint-disable-line */
+    height: calc(100vh - 10rem); /* stylelint-disable-line */
 }
 
 /* ...but hide it once another one is selected */
@@ -387,6 +387,14 @@ svg image.mml-i {
 @supports (display: flex) {
     #outdatedMessage {
         display: none;
+    }
+
+    /* We don't need to preserve space for the warning now */
+    main section:target { /* stylelint-disable-line */
+        height: calc(100vh - 4rem); /* stylelint-disable-line */
+    }
+    main section:last-of-type { /* stylelint-disable-line */
+        height: calc(100vh - 4rem); /* stylelint-disable-line */
     }
 }
 
