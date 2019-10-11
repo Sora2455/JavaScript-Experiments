@@ -76,8 +76,9 @@ class TableDrawer {
             const rowEl = document.createElement("tr");
             for (let col = 0; col < nCount; col++) {
                 const cell = document.createElement("td");
-                cell.style.backgroundColor = TableDrawer.isDark(row, col, oQRCode) ?
-                    this.htOption.colorDark : this.htOption.colorLight;
+                if (TableDrawer.isDark(row, col, oQRCode)) {
+                    cell.setAttribute("class", "b");
+                }
                 rowEl.appendChild(cell);
             }
             table.appendChild(rowEl);
