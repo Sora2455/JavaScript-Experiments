@@ -76,6 +76,9 @@ async function sendPendingJson(): Promise<void> {
             },
             method: "POST"
         });
+        if (!result.ok) {
+            throw new Error(`Result of call to ${pendingSend.endpoint} was ${result.statusText}`);
+        }
         const status = result.status;
         const resultJson = await result.json();
         await deletePendingSend(db, pendingSend.id);
