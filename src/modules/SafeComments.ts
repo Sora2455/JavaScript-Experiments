@@ -84,7 +84,7 @@ interface ICommentData {
     const blacklistedAttributeSelector = blacklistedAttributes.map((att) => `[${att}]`).join(", ");
     // Set up a date formatter function for later
     const dateTimeFormatter = new Intl.DateTimeFormat(
-        [navigator.language, document.documentElement.lang],
+        navigator.languages.concat([document.documentElement.lang]),
         {
             day: "numeric",
             hour: "numeric",
@@ -243,7 +243,7 @@ interface ICommentData {
                 "<meta name=\"referrer\" content=\"no-referrer\">" +
                 // Finally, set our comment stylesheet
                 "<link rel=\"stylesheet\" href=\"safeComments.css\">" +
-            "</head><body>" +
+            "</head><body>" + // TODO add two questions about page that must be answered before you can comment
                 commentHtml +
                 // We use this data element to tell when the iframe has fully loaded
                 // (if this element doesn't exist, it hasn't)
