@@ -2,21 +2,22 @@ import {AutoCompleteSearch} from "./modules/AutoComplete.js";
 import {postJson} from "./modules/EnsureSendJson.js";
 import "./modules/LazyLoad.js";
 import "./modules/Localiser.js";
+import {loadBytecode} from "./modules/LoadBytecode.js";
 import {onBuyClicked} from "./modules/PaymentRequest.js";
 import {PrintManager} from "./modules/PrintManager.js";
 import {ReadyManager, Requirement} from "./modules/readyManager.js";
-// import {loadBytecode} from "./modules/LoadBytecode.js";
 // startnopolyfill (compiler directive)
 import "./modules/SafeComments.js";
 import "./modules/TimingInformationELem.js";
 // endnopolyfill
 
 const readyManager = new ReadyManager();
-/*manager.whenReady(() => {
-    loadBytecode("/build/bytecode/demo.wasm", window, null, 1, exports => {
-        console.log(exports._my_add(1, 2));
+readyManager.whenReady(() => {
+    loadBytecode("/bytecode/demo.wasm", null, 1, (exports) => {
+        // tslint:disable-next-line:no-console
+        console.log(exports.my_add(1, 2));
     });
-});*/
+});
 readyManager.whenReady(() => {
     const buyTest = document.getElementById("buyTest");
     if (buyTest) {

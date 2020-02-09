@@ -1,20 +1,24 @@
-export function loadBytecode(url: string, stdlib: any, foreign: any, pages: number,
+export function loadBytecode(url: string, imports: any, pages: number,
                              callback: (exports: IModuleExports, buffer: ArrayBuffer) => void): void {
-    if ("WebAssembly" in window) {
-        const buffer = new ArrayBuffer(0x10000 * pages);
-        url = `${url}.js`;
-        loadAsmJs(url, stdlib, foreign, buffer, (exports) => {
-            if (!exports) { throw new Error("Unable to load wasm code!"); }
-            callback(exports, buffer);
+    if (typeof WebAssembly !== "undefined") {
+        // TODO Chrome/Safari currently don't allow WASM under CSP as they think it's eval
+        const memory = new WebAssembly.Memory({initial: 10, maximum: 100});
+        loadWebAssembly(url, (instance) => {
+            if (!instance || !instance.exports) { throw new Error("Unable to load wasm code!"); }
+            callback(exports, memory.buffer);
+        }, {
+            imports,
+            js: { mem: memory }
         });
     } else if (typeof ArrayBuffer === "function") {
         const buffer = new ArrayBuffer(0x10000 * pages);
         url = url.replace(".wasm", ".asm.js");
-        loadAsmJs(url, stdlib, foreign, buffer, (exports) => {
+        loadAsmJs(url, imports, buffer, (exports) => {
             if (!exports) { throw new Error("Unable to load asm.js code!"); }
             callback(exports, buffer);
         });
     } else {
+        // TODO: Polyfill Math.imut and the other 3 methods needed
         throw new Error("This browser doesn't support ArrayBuffer (i.e. older than IE10)!");
     }
 }
@@ -38,7 +42,8 @@ interface WebAssemblyResult {
 
 // tslint:disable-next-line:interface-name
 interface WebAssemblyModule {
-
+    /** A typed array or ArrayBuffer containing the binary code of the .wasm module you want to compile. */
+    bufferSource: ArrayBuffer;
 }
 
 // tslint:disable-next-line:interface-name
@@ -61,17 +66,19 @@ interface WebAssemblyMemoryDescriptor {
     maximum?: number;
 }
 
-declare class WebAssemblyMemory {
+// tslint:disable-next-line:interface-name
+declare interface WebAssemblyMemory {
     /**
      * An accessor property that returns the buffer contained in the memory.
      */
-    public buffer: ArrayBuffer;
+    buffer: ArrayBuffer;
     /**
      * The grow() protoype method of the Memory object increases the size of
      * the memory instance by a specified number of WebAssembly pages (64KB).
      */
-    public grow: (pages: number) => void;
-    constructor(options: WebAssemblyMemoryDescriptor);
+    grow: (pages: number) => void;
+    // tslint:disable-next-line:no-misused-new
+    new(options: WebAssemblyMemoryDescriptor): WebAssemblyMemory;
 }
 
 declare class WebAssemblyTable {
@@ -141,55 +148,52 @@ interface IModuleExports {
     [label: string]: (...args: any[]) => any;
 }
 
-/**
- * Loads and compiles asm.js code from the server
- * @param url The url to load your asm.js code from
- * @param stdlib The standard library that you want to pass to your code
- * @param foreign Any JavaScript functions you want to pass to your code
- * @param buffer The memory allocated for your function
- * @param callback A callback function that will be called with the module exports (or null, if there was an error)
- */
-function loadAsmJs(url: string, stdlib: any, foreign: any, buffer: ArrayBuffer,
-                   callback: (module: IModuleExports) => void): void {
-    const urlParts = url.split("/");
-    const moduleFileName = urlParts[urlParts.length - 1].replace(/\./g, "");
-    // first, check if the module has already been loaded
-    if (moduleFileName in window) {
-        instantiateAsmJs(moduleFileName, buffer, callback);
-    } else {
-        // otherwise load it now
-        const script = document.createElement("script");
-        script.onerror = () => {
-            callback(null);
-        };
-        script.onload = () => {
-            instantiateAsmJs(moduleFileName, buffer, callback);
-        };
-        script.src = url;
-        document.head.appendChild(script);
+declare global {
+    // tslint:disable-next-line:interface-name
+    interface Window {
+        Module: IAsmModule;
     }
+}
+
+interface IAsmModule {
+    wasm: ArrayBuffer;
+    mem: ArrayBuffer;
 }
 
 /**
  * Loads and compiles asm.js code from the server
- * @param moduleFileName The name of your module's creation code (by convention [name]asmjs)
- * @param stdlib The standard library that you want to pass to your code
- * @param foreign Any JavaScript functions you want to pass to your code
+ * @param url The url to load your asm.js code from
+ * @param imports Any JavaScript functions you want to pass to your code
  * @param buffer The memory allocated for your function
  * @param callback A callback function that will be called with the module exports (or null, if there was an error)
  */
-function instantiateAsmJs(moduleFileName: string, buffer: ArrayBuffer, callback: (module: IModuleExports) => void) {
-    let instance = {} as any;
-    // @ts-ignore: No index on window
-    instance = window[moduleFileName]({
-        TOTAL_MEMORY: buffer.byteLength,
-        TOTAL_STACK: buffer.byteLength,
-        buffer,
-        onRuntimeInitialized: () => {
-            // give it a milisecond for the object reference to set
-            setTimeout(() => {
-                callback(instance.asm);
-            }, 1);
-        }
+function loadAsmJs(url: string, imports: any, buffer: ArrayBuffer,
+                   callback: (module: IModuleExports) => void): void {
+    // Set up initialisation paramatars
+    self.Module = {
+        mem: new ArrayBuffer(0),
+        wasm: new ArrayBuffer(0)
+    };
+    const script = document.createElement("script");
+    script.onerror = () => {
+        callback(null);
+    };
+    script.onload = () => {
+        instantiateAsmJs(buffer, imports, callback);
+    };
+    script.src = url;
+    document.head.appendChild(script);
+}
+
+/**
+ * Loads and compiles asm.js code from the server
+ * @param imports Any JavaScript functions you want to pass to your code
+ * @param buffer The memory allocated for your function
+ * @param callback A callback function that will be called with the module exports (or null, if there was an error)
+ */
+function instantiateAsmJs(buffer: ArrayBuffer, imports: any, callback: (module: IModuleExports) => void) {
+    // TODO actually use the buffer somewhere
+    (WebAssembly.instantiate(self.Module.wasm, imports) as PromiseLike<any>).then((output) => {
+        callback(output.instance.exports);
     });
 }
