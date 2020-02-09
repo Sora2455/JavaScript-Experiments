@@ -217,7 +217,7 @@ gulp.task("polyfills", gulp.parallel("polyfillsEs3", "polyfillsEs5"));
 
 gulp.task("compileBytecode", function(done) {
     exec("cd src && make.bat", function (err, stdout, stderr) {
-        console.log(stdout);
+        //console.log(stdout);
         console.log(stderr);
         done(err);
     });
