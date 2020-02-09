@@ -1,3 +1,11 @@
+/**
+ * Loads WebAssembly with an ASM.JS fallback
+ * @param url The URL to the WebAssembly to load
+ * @param imports The items to import into the WebAssembly code
+ * @param pages The pages of memory the module is expected to use
+ * @param callback A callback function to run with the exported functions and internal memory
+ * of the module
+ */
 export function loadBytecode(url: string, imports: any, pages: number,
                              callback: (exports: IModuleExports, buffer: ArrayBuffer) => void): void {
     if (typeof WebAssembly !== "undefined") {
