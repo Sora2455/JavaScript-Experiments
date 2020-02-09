@@ -8,13 +8,18 @@ export function loadBytecode(url: string, imports: any, pages: number,
             initial: 1,
             maximum: 1 + 0
         });
+        // tslint:disable-next-line:no-empty
+        const noop = () => {};
         const asmLibraryArg = {
+            args_get: noop,
+            args_sizes_get: noop,
             memory: wasmMemory,
+            proc_exit: noop,
             table: wasmTable
         };
         loadWebAssembly(url, (instance) => {
             if (!instance || !instance.exports) { throw new Error("Unable to load wasm code!"); }
-            callback(exports, wasmMemory.buffer);
+            callback(instance.exports, wasmMemory.buffer);
         }, {
             env: asmLibraryArg,
             imports,
