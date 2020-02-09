@@ -2,11 +2,11 @@ export function loadBytecode(url: string, imports: any, pages: number,
                              callback: (exports: IModuleExports, buffer: ArrayBuffer) => void): void {
     if (typeof WebAssembly !== "undefined") {
         // TODO Chrome/Safari currently don't allow WASM under CSP as they think it's eval
-        const wasmMemory = new WebAssembly.Memory({initial: 10, maximum: 100});
+        const wasmMemory = new WebAssembly.Memory({initial: pages, maximum: pages * 3});
         const wasmTable = new WebAssembly.Table({
             element: "anyfunc",
             initial: 1,
-            maximum: 1 + 0
+            maximum: 2
         });
         // tslint:disable-next-line:no-empty
         const noop = () => {};
