@@ -2,13 +2,23 @@ export function loadBytecode(url: string, imports: any, pages: number,
                              callback: (exports: IModuleExports, buffer: ArrayBuffer) => void): void {
     if (typeof WebAssembly !== "undefined") {
         // TODO Chrome/Safari currently don't allow WASM under CSP as they think it's eval
-        const memory = new WebAssembly.Memory({initial: 10, maximum: 100});
+        const wasmMemory = new WebAssembly.Memory({initial: 10, maximum: 100});
+        const wasmTable = new WebAssembly.Table({
+            element: "anyfunc",
+            initial: 1,
+            maximum: 1 + 0
+        });
+        const asmLibraryArg = {
+            memory: wasmMemory,
+            table: wasmTable
+        };
         loadWebAssembly(url, (instance) => {
             if (!instance || !instance.exports) { throw new Error("Unable to load wasm code!"); }
-            callback(exports, memory.buffer);
+            callback(exports, wasmMemory.buffer);
         }, {
+            env: asmLibraryArg,
             imports,
-            js: { mem: memory }
+            wasi_snapshot_preview1: asmLibraryArg
         });
     } else if (typeof ArrayBuffer === "function") {
         const buffer = new ArrayBuffer(0x10000 * pages);
@@ -81,26 +91,28 @@ declare interface WebAssemblyMemory {
     new(options: WebAssemblyMemoryDescriptor): WebAssemblyMemory;
 }
 
-declare class WebAssemblyTable {
+// tslint:disable-next-line:interface-name
+declare interface WebAssemblyTable {
     /**
      * Returns the length of the table, i.e. the number of elements.
      */
-    public length: number;
+    length: number;
     /**
      * Accessor function — gets the element stored at a given index.
      */
     // tslint:disable-next-line:ban-types
-    public get: (index: number) => Function;
+    get: (index: number) => Function;
     /**
      * Sets an element stored at a given index to a given value.
      */
     // tslint:disable-next-line:ban-types
-    public set: (index: number, value: Function) => void;
+    set: (index: number, value: Function) => void;
     /**
      * Increases the size of the Table instance by a specified number of elements.
      */
-    public grow: (elements: number) => void;
-    constructor(options: WebAssembleTableDescriptor);
+    grow: (elements: number) => void;
+    // tslint:disable-next-line:no-misused-new
+    new(options: WebAssembleTableDescriptor): WebAssemblyTable;
 }
 
 // tslint:disable-next-line:interface-name
@@ -121,8 +133,7 @@ interface WebAssembleTableDescriptor {
 }
 
 /**
- * MDN-inspired code to load WebAssembly from the net only if it wasn't already cached
- * @link https://github.com/mdn/webassembly-examples/blob/master/wasm-utils.js
+ * MDN-inspired code to load WebAssembly from the net
  */
 function loadWebAssembly(url: string, callback: (instance: WebAssemblyInstance) => void, importObject?: any): void {
     fetchWebassembly(url, importObject).then((results) => {
