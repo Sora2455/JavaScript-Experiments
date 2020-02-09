@@ -1,5 +1,3 @@
-call C:\Users\boree\Downloads\emsdk\emsdk_env.bat
-
 if not exist "..\build\bytecode\" mkdir "..\build\bytecode\"
 
 cd "c code"
