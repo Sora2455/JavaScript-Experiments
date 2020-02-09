@@ -126,7 +126,7 @@ interface WebAssembleTableDescriptor {
      * A string representing the type of value to be stored in the table.
      * At the moment this can only have a value of "anyfunc" (functions).
      */
-    element: string;
+    element: "anyfunc";
     /**
      * The initial number of elements of the WebAssembly Table.
      */
@@ -138,7 +138,10 @@ interface WebAssembleTableDescriptor {
 }
 
 /**
- * MDN-inspired code to load WebAssembly from the net
+ * Loads WebAssembly from the given URL and instantiates it with the given import object
+ * @param url The URL of the WebAssembly to fetch
+ * @param callback A callback function that takes the WebAssembly instace we created
+ * @param importObject The import object when we instantiate the WebAssembly module
  */
 function loadWebAssembly(url: string, callback: (instance: WebAssemblyInstance) => void, importObject?: any): void {
     fetchWebassembly(url, importObject).then((results) => {
@@ -146,6 +149,11 @@ function loadWebAssembly(url: string, callback: (instance: WebAssemblyInstance) 
     });
 }
 
+/**
+ * Fetches and instantiates WebAssembly from the given URL and with the given import object
+ * @param url The URL of the WebAssembly to fetch
+ * @param importObject The import object when we instantiate the WebAssembly module
+ */
 function fetchWebassembly(url: string, importObject?: any): Promise<WebAssemblyResult> {
     // all browsers that support WebAssembly support fetch
     const fetchedBytes = fetch(url);
