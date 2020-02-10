@@ -338,7 +338,7 @@ function addLazyYouTube(element) {
                 `srcdoc="<link rel='stylesheet' href='lazyYouTube.css' /> ` +
                 `<a href=https://www.youtube.com/embed/${videoCode}?autoplay=1> ` +
                     `<img src=https://img.youtube.com/vi/${videoCode}/hqdefault.jpg ` +
-                        `alt='Video ${videoTitle}'> ` +
+                        `alt='Video ${videoTitle}' width='480' height='360'> ` +
                     `<span>▶</span> ` +
                 `</a>" ` +
                 `frameborder="0" ` +
