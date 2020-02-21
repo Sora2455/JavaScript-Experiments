@@ -48,12 +48,15 @@ function setHeaders(res, path, stat){
             "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; " +
             "frame-src 'self' https://www.youtube.com;");
         res.setHeader("Referrer-Policy", "same-origin");
-        res.setHeader("Feature-Policy", "sync-xhr 'none'; document-write 'none'; vertical-scroll 'none'; " +
-            "sync-script 'none'; image-compression 'none'; legacy-image-formats 'none'; " +
-            "max-downscaling-image 'none'; unsized-media 'none'; accelerometer 'none'; " +
+        res.setHeader("Feature-Policy", "sync-xhr 'none'; " +
+            "sync-script 'none'; legacy-image-formats 'none'; " +
+            "accelerometer 'none'; " +
             "ambient-light-sensor 'none'; camera 'none'; gyroscope 'none'; magnetometer 'none'; " +
-            "microphone 'none'; fullscreen 'none'; encrypted-media 'none'; document-domain 'none';" +
-            "autoplay 'self'; geolocation 'none'; payment 'self'; vr 'none';");
+            "microphone 'none'; fullscreen 'none'; encrypted-media 'none'; document-domain 'none'; " +
+            "autoplay 'self'; geolocation 'none'; payment 'self'; xr-spatial-tracking 'none'; " +
+            "usb 'none'; midi 'none';");
+        res.setHeader("Document-Policy", "no-unsized-media, no-document-write, no-vertical-scroll, " +
+            "image-compression;bpp=2");
         res.setHeader("X-Frame-Options", "sameorigin");
         res.setHeader("Cross-Origin-Window-Policy", "Allow-PostMessage");
         res.setHeader("X-UA-Compatible", `IE=${ieVersion}`);
