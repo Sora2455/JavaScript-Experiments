@@ -20,7 +20,7 @@ if ("customElements" in self) {
             // Always call super first in constructor
             super();
 
-            const locales = [navigator.language, document.documentElement.lang];
+            const locales = navigator.languages.concat([document.documentElement.lang]);
             const getTimeInSecondsSecondsString = (timeInMilliseconds: number) => {
                 if (typeof timeInMilliseconds !== "number") { return "unknown"; }
                 const timeInSeconds = timeInMilliseconds / 1000;
