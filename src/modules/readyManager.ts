@@ -36,18 +36,6 @@ declare global {
         detachEvent(eventNameWithOn: string, handler: () => void): void;
     }
 }
-type RequestIdleCallbackHandle = number;
-interface IRequestIdleCallbackOptions {
-    timeout: number;
-}
-interface IRequestIdleCallbackDeadline {
-    readonly didTimeout: boolean;
-    timeRemaining: (() => number);
-}
-declare var requestIdleCallback: ((
-    callback: ((deadline: IRequestIdleCallbackDeadline) => void),
-    opts?: IRequestIdleCallbackOptions,
-) => RequestIdleCallbackHandle);
 interface IFeature {
     /**
      * A function that returns true if the feature is availible for use
@@ -96,10 +84,6 @@ export const Requirement: IFeatureList = {
     requestAnimationFrame: {
         polyfillSrc: "/polyfills/es3/RequestAnimationFrame.js",
         test: () => typeof requestAnimationFrame === "function"
-    },
-    requestIdleCallback: {
-        polyfillSrc: "/polyfills/es3/RequestIdleCallback.js",
-        test: () => typeof requestIdleCallback === "function"
     },
     sendBeacon: {
         polyfillSrc: "/polyfills/es3/SendBeacon.js",
