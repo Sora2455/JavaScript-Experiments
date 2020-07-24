@@ -151,9 +151,7 @@ interface ICommentData {
         protected connectedCallback() {
             this.setCommentData();
             if (typeof ResizeObserver === "function") {
-                this.resizeObserver = new ResizeObserver(() => {
-                    this.setIFrameHeight();
-                });
+                this.resizeObserver = new ResizeObserver(this.setIFrameHeight);
                 this.resizeObserver.observe(this.content);
             } else {
                 s.addEventListener("resize", this.setIFrameHeight);
