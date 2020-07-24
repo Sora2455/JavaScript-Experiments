@@ -18,7 +18,7 @@ const siteUrl = "http://localhost:8080/";
 const browsers = ["Firefox", "Chrome", "IE8", "IE9", "IE10", "IE11", "Edge", "noscript"];
 let server;
 let messageServer;
-
+//TODO fix broken tests
 describe("Cross-browser testing", async function() {
     before(async function() {
         server = fork("server.js");
