@@ -96,18 +96,6 @@ function localiseNumbers() {
     }
 }
 
-interface IWebShareOptions {
-    title?: string;
-    text?: string;
-    url?: string;
-}
-declare global {
-    // tslint:disable-next-line:interface-name
-    interface Navigator {
-        share: (ops: IWebShareOptions) => Promise<null>;
-    }
-}
-
 /**
  * If the Web Share API is supported, replace the Share links with one generic share button
  */

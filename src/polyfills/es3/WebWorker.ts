@@ -9,7 +9,7 @@ if (typeof Worker !== "function") {
     // @ts-ignore Polyfill does not match worker interface
     window.Worker = function(scriptFile: string) {
         const self = this;
-        let timeHandle = null as NodeJS.Timeout;
+        let timeHandle = null as number;
 
         /** This is the onMessage that the worker code listens on */
         const onmessage = null as (text: any) => void;
