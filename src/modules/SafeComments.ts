@@ -79,8 +79,9 @@ interface ICommentData {
     const blacklistedElementSelector = "style, script, img, image, picture, canvas, svg, math, map, video, audio, " +
                                        "object, applet, iframe, frameset, frame, embed, form, input, " +
                                        "textarea, select, button, keygen, marquee, meta, base, link, noscript";
+    // Name and ID are banned to stop DOM Cobbling https://research.securitum.com/xss-in-amp4email-dom-clobbering/
     const blacklistedAttributes = ["background", "bgcolor", "border", "color", "contenteditable", "class", "draggable",
-                                   "dropzone", "height", "hidden", "id", "ping", "style", "width"];
+                                   "dropzone", "height", "hidden", "id", "name", "ping", "style", "width"];
     const blacklistedAttributeSelector = blacklistedAttributes.map((att) => `[${att}]`).join(", ");
     // Set up a date formatter function for later
     const dateTimeFormatter = new Intl.DateTimeFormat(
