@@ -1,0 +1,8 @@
+Run this instruction in Powershell:
+New-SelfSignedCertificate -CertStoreLocation Cert:\LocalMachine\My -DnsName "localhost" -FriendlyName "JS Testing cert" -NotAfter (Get-Date).AddYears(10)
+
+Generally follow https://web.archive.org/web/20200724104358/https://www.oshyn.com/blog/2017/11/windows-10-self-signed-certificates
+
+Then export the certificate with the private key and stick it in this folder, then export it again as a cer FriendlyName
+
+TODO how to get FireFox to trust this cert
