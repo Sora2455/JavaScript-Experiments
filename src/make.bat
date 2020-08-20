@@ -1,8 +1,8 @@
 if not exist "..\build\bytecode\" mkdir "..\build\bytecode\"
 
-cd "c code"
+cd "rust code"
 
 rem Build asm.js for old browsers
-for %%i in (*) do start cmd.exe @cmd /k "emcc %%~nxi -O3 -s WASM=0 -s INVOKE_RUN=0 -s ENVIRONMENT='worker' -s MINIMAL_RUNTIME=1 -s LEGACY_VM_SUPPORT=1 -o ../../build/bytecode/%%~ni.asm.js && exit || echo error in %%~nxi"
+for %%i in (*) do rustc %%~nxi --target asmjs-unknown-emscripten -C opt-level=0 -C link-arg="-s ENVIRONMENT=worker" -C link-arg="-s MINIMAL_RUNTIME=1" -C link-arg="-s LEGACY_VM_SUPPORT=1" -o ../../build/bytecode/%%~ni.asm.js
 rem Build WebAssembly for new browsers
-for %%i in (*) do start cmd.exe @cmd /k "emcc %%~nxi -O3 -s WASM=1 -o ../../build/bytecode/%%~ni.wasm && exit || echo error in %%~nxi"
+for %%i in (*) do rustc %%~nxi --target wasm32-unknown-emscripten -C opt-level=3 -o ../../build/bytecode/%%~ni.wasm

@@ -1,0 +1,48 @@
+[package]
+name = "JavaScript_Experiments"
+version = "0.1.0"
+authors = ["Sora2455 <boreenpt@gmail.com>"]
+edition = "2018"
+description = "The Rust assemblies used to compile WebAssembly for my JavaScript experiments"
+readme = "README.md"
+repository = "https://github.com/Sora2455/JavaScript-Experiments/"
+license = "MIT"
+
+[lib]
+name = "demo"
+path = "src/rust code/demo.rs"
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = ["console_error_panic_hook"]
+
+[dependencies]
+wasm-bindgen = "0.2"
+
+# The `console_error_panic_hook` crate provides better debugging of panics by
+# logging them with `console.error`. This is great for development, but requires
+# all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
+# code size when deploying.
+console_error_panic_hook = { version = "0.1.1", optional = true }
+
+# `wee_alloc` is a tiny allocator for wasm that is only ~1K in code size
+# compared to the default allocator's ~10K. It is slower than the default
+# allocator, however.
+#
+# Unfortunately, `wee_alloc` requires nightly Rust when targeting wasm for now.
+wee_alloc = { version = "0.4.2", optional = true }
+
+[dev-dependencies]
+wasm-bindgen-test = "0.2"
+
+[profile.dev]
+opt-level = 0       # No optimisations
+lto = true          # Enable Link Time Optimization
+codegen-units = 1   # Reduce number of codegen units to increase optimizations.
+panic = 'abort'     # Abort on panic
+
+[profile.release]
+opt-level = 'z'     # Optimize for size.
+lto = true          # Enable Link Time Optimization
+codegen-units = 1   # Reduce number of codegen units to increase optimizations.
+panic = 'abort'     # Abort on panic
