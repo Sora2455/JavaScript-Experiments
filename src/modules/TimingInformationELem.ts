@@ -27,8 +27,11 @@ if ("customElements" in self) {
                 return timeInSeconds.toLocaleString(locales,
                     {
                         maximumFractionDigits: 2,
-                        minimumFractionDigits: 2
-                    }) + " seconds";
+                        minimumFractionDigits: 2,
+                        style: "unit",
+                        unit: "second",
+                        unitDisplay: "long"
+                    });
             };
 
             const shadow = this.attachShadow({mode: "open"});
