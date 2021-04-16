@@ -47,11 +47,11 @@ function setHeaders(res, path, stat){
         res.setHeader("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; " +
             "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self';");
         res.setHeader("Referrer-Policy", "same-origin");
-        res.setHeader("Permissions-Policy", "sync-xhr 'none'; sync-script 'none'; legacy-image-formats 'none'; " +
-            "accelerometer 'none'; ambient-light-sensor 'none'; camera 'none'; gyroscope 'none'; " +
-            "magnetometer 'none'; microphone 'none'; fullscreen 'none'; encrypted-media 'none'; " +
-            "document-domain 'none'; autoplay 'self'; geolocation 'none'; payment 'self'; " +
-            "xr-spatial-tracking 'none'; usb 'none'; midi 'none';");
+        res.setHeader("Permissions-Policy", "sync-xhr=(), sync-script=(), legacy-image-formats=(), " +
+            "accelerometer=(), ambient-light-sensor=(), camera=(), gyroscope=(), " +
+            "magnetometer=(), microphone=(), fullscreen=(), encrypted-media=(), " +
+            "document-domain=(), autoplay=(), geolocation=(), payment=(self), " +
+            "xr-spatial-tracking=(), usb=(), midi=(), interest-cohort=()");
         res.setHeader("Document-Policy", "no-unsized-media, no-document-write, no-vertical-scroll, " +
             "image-compression;bpp=2");
         res.setHeader("X-Frame-Options", "sameorigin");
