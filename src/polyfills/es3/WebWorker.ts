@@ -25,6 +25,7 @@ if (typeof Worker !== "function") {
         /** This is the postMessage that outside code uses to post 'questions' to the worker */
         self.postMessage = (text: any) => {
             // Execute on a timer so we dont block (well as good as we can get in a single thread)
+            // @ts-ignore TypeScript thinks this is the Node.Js version, which has a different return value
             timeHandle = setTimeout(() => {
                 if ("function" === typeof self.onmessage) {
                   onmessage({ data : text });

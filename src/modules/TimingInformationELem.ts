@@ -29,6 +29,7 @@ if ("customElements" in self) {
                         maximumFractionDigits: 2,
                         minimumFractionDigits: 2,
                         style: "unit",
+                        // @ts-ignore This is totally a valid option, TypeScript just hasn't caught up
                         unit: "second",
                         unitDisplay: "long"
                     });
