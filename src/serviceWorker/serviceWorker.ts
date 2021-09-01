@@ -1,4 +1,4 @@
-importScripts("workers/ensureSendJsonSw.min.js");
+importScripts("workers/ensureSendJsonSw.js");
 
 /**
  * Moves the contents of one named cached into another.

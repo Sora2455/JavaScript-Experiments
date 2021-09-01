@@ -1,19 +1,21 @@
 "use strict";
-const fs = require('fs');
-const path = require('path');
-const fastify = require('fastify');
-const compression = require('fastify-compress');
-const serveStatic = require('fastify-static');
-const PImage = require('pureimage');
-const qrCode = require("./build/noModules/modules/QRCodeRenderer");
+import { readFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+import fastify from 'fastify';
+import compression from 'fastify-compress';
+import serveStatic from 'fastify-static';
+import { make, encodePNGToStream } from 'pureimage';
+import { QRCodeModel, _getTypeNumber } from "./build/modules/modules/QRCodeRenderer.js";
 
 let ieVersion = "edge";
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const server = fastify({
     http2: true,
     https: {
         allowHTTP1: true, // fallback support for HTTP1
-        pfx: fs.readFileSync(path.join(__dirname, 'https', 'testingCert.pfx')),
+        pfx: readFileSync(join(__dirname, 'https', 'testingCert.pfx')),
         passphrase: "testingCert"
     }
 });
@@ -85,8 +87,8 @@ function handleDynamicImages (req, reply) {
 }
 
 function return1x1pxPng(reply) {
-    const image = PImage.make(1, 1);
-    PImage.encodePNGToStream(image, reply.res);
+    const image = make(1, 1);
+    encodePNGToStream(image, reply.res);
 }
 
 function setNoCache(res) {
@@ -94,7 +96,7 @@ function setNoCache(res) {
 }
 
 function drawQrCode(reply, codeString) {
-    const model = new qrCode.QRCodeModel(qrCode._getTypeNumber(codeString, 2), 2);
+    const model = new QRCodeModel(_getTypeNumber(codeString, 2), 2);
     model.addData(codeString);
     model.make();
 
@@ -103,7 +105,7 @@ function drawQrCode(reply, codeString) {
     const imageSize = 360;
     const cellSize = imageSize / nCount;
 
-    const image = PImage.make(imageSize, imageSize);
+    const image = make(imageSize, imageSize);
     const ctx = image.getContext("2d");
 
     for (let row = 0; row < nCount; row++) {
@@ -115,7 +117,7 @@ function drawQrCode(reply, codeString) {
         }
     }
 
-    PImage.encodePNGToStream(image, reply.res);
+    encodePNGToStream(image, reply.res);
 }
 
 function reflectJson(req, reply) {

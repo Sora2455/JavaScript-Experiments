@@ -107,7 +107,7 @@ new ReadyManager().whenReady(() => {
             typeNumber: 4
         } as IHtOption;
         const drawer = new TableDrawer(QRCodeResult, htOption);
-        const qrCodeWorker = new Worker("workers/QRCodeRenderer.min.js");
+        const qrCodeWorker = new Worker("workers/QRCodeRenderer.js");
         qrCodeWorker.onmessage = (ev) => {
             const qrCode = ev.data as IQRCodeModel;
             drawer.draw(qrCode);

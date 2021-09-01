@@ -1,30 +1,26 @@
 "use strict";
-const gulp = require("gulp");
-const postcss = require("gulp-postcss");
-const cssnano = require("cssnano");
-const ts = require("gulp-typescript");
-const replace = require("gulp-replace");
-const extReplace = require("gulp-ext-replace");
-const uglifyEs = require("uglify-es");
-const composer = require("gulp-uglify/composer");
+import gulp from "gulp";
+import postcss from "gulp-postcss";
+import cssnano from "cssnano";
+import ts from "gulp-typescript";
+import replace from "gulp-replace";
+import extReplace from "gulp-ext-replace";
+import uglifyEs from "uglify-es";
+import composer from "gulp-uglify/composer.js";
 const uglify = composer(uglifyEs, console);
-const sourcemaps = require("gulp-sourcemaps");
-const htmlmin = require("gulp-htmlmin");
-const del = require("del");
-const browserify = require("browserify");
-const source = require("vinyl-source-stream");
-const buffer = require("vinyl-buffer");
-const merge = require("merge-stream");
-const glob = require("glob");
-const path = require("path");
-const imagemin = require("gulp-imagemin");
-const imageminWebp = require("imagemin-webp");
-const ffmpeg = require("fluent-ffmpeg");
-const exec = require("child_process").exec;
-const realFavicon = require("gulp-real-favicon");
-const bust = require("gulp-buster");
-const fs = require("fs");
-const autoprefixer = require('autoprefixer');
+import sourcemaps from "gulp-sourcemaps";
+import htmlmin from "gulp-htmlmin";
+import del from "del";
+import glob from "glob";
+import path from "path";
+import imagemin from "gulp-imagemin";
+import imageminWebp from "imagemin-webp";
+import ffmpeg from "fluent-ffmpeg";
+import { exec } from "child_process";
+import realFavicon from "gulp-real-favicon";
+import bust from "gulp-buster";
+import fs from "fs";
+import autoprefixer from "autoprefixer";
 
 // File where the favicon markups are stored
 const FAVICON_DATA_FILE = "src/favicon/faviconData.json";
@@ -37,9 +33,7 @@ const gifConvertOptions = "[0:v] fps=12,scale=320:-1:flags=lanczos," +
     "split [a][b];[a] palettegen [p];[b][p] paletteuse";
 
 const polyfillRegex = /\/\/ startpolyfill[\s\S]*?\/\/ endpolyfill/g;
-const noPolyfillRegex = /\/\/ startnopolyfill[\s\S]*?\/\/ endnopolyfill/g;
 
-const oldModuleOptions = {ie8:true};
 const newModuleOptions = {safari10:true};
 
 gulp.task("newModules", function(){
@@ -62,20 +56,6 @@ gulp.task("newModules", function(){
                 .pipe(gulp.dest("build/modules/modules"));
 });
 
-gulp.task("oldModules", function(){
-    return gulp.src("src/Modules/*.ts")
-                //Old browsers cannot run features enclosed by this marker
-                .pipe(replace(noPolyfillRegex, ""))
-                .pipe(ts({
-                    noImplicitAny: true,
-                    target: "ES3",
-                    module: "commonjs",
-                    removeComments: true,
-                    sourceMap: false
-                }))
-                .pipe(gulp.dest("build/noModules/modules"));
-});
-
 gulp.task("moduleCode", gulp.series("newModules", function(){
     return gulp.src("src/*.ts")
                 .pipe(sourcemaps.init({loadMaps: true}))
@@ -94,44 +74,12 @@ gulp.task("moduleCode", gulp.series("newModules", function(){
                 .pipe(gulp.dest("build/modules"));
 }));
 
-gulp.task("compileNoModuleCode", gulp.series("oldModules", function() {
-    return gulp.src("src/*.ts")
-                //Old browsers cannot run features enclosed by this marker
-                .pipe(replace(noPolyfillRegex, ""))
-                .pipe(sourcemaps.init({loadMaps: true}))
-                .pipe(ts({
-                    noImplicitAny: true,
-                    target: "ES3",
-                    module: "commonjs",
-                    removeComments: true,
-                    sourceMap: false
-                }))
-                .pipe(sourcemaps.write("./"))
-                .pipe(gulp.dest("build/noModules"));
-}));
-
-gulp.task("noModuleCode", function() {
-    const files = glob.sync("build/noModules/*.js");
-    return merge(files.map(function(file) {
-        return browserify({
-            entries: file,
-            debug: true
-        }).bundle()
-            .pipe(source(path.basename(file, ".js") + ".min.js"))
-            .pipe(buffer())
-            .pipe(sourcemaps.init({loadMaps: true}))
-            .pipe(uglify(oldModuleOptions))
-            .pipe(sourcemaps.write("./"))
-            .pipe(gulp.dest("build/noModules"))
-      }));
-});
-
 gulp.task("compileServiceWorkerCode", function() {
     return gulp.src("src/serviceWorker/*.ts")
                 .pipe(sourcemaps.init({loadMaps: true}))
                 .pipe(ts({
                     noImplicitAny: true,
-                    target: "es6",
+                    target: "ES2015",
 		            module: "es2015",
                     removeComments: true,
                     sourceMap: false,
@@ -141,6 +89,7 @@ gulp.task("compileServiceWorkerCode", function() {
                         "scripthost"
                     ]
                 }))
+                .pipe(uglify(newModuleOptions))
                 .pipe(sourcemaps.write("./"))
                 .pipe(gulp.dest("build"));
 });
@@ -150,8 +99,8 @@ gulp.task("compileWorkerCode", function() {
                 .pipe(sourcemaps.init({loadMaps: true}))
                 .pipe(ts({
                     noImplicitAny: true,
-                    target: "ES3",
-                    module: "commonjs",
+                    target: "ES2015",
+                    module: "es2015",
                     removeComments: true,
                     sourceMap: false,
                     lib: [
@@ -160,60 +109,12 @@ gulp.task("compileWorkerCode", function() {
                         "scripthost"
                     ]
                 }))
-                //Rewrite module path so that browserify knows where to look
-                .pipe(replace('"../modules/', '"./../noModules/modules/'))
+                .pipe(uglify(newModuleOptions))
                 .pipe(sourcemaps.write("./"))
                 .pipe(gulp.dest("build/workers"));
 });
 
-gulp.task("workerCode", gulp.series("compileWorkerCode", "compileServiceWorkerCode", function() {
-    const files = glob.sync("build/workers/*.js");
-    return merge(files.map(function(file) {
-        return browserify({
-            entries: file,
-            debug: true
-        }).bundle()
-            .pipe(source(path.basename(file, ".js") + ".min.js"))
-            .pipe(buffer())
-            .pipe(sourcemaps.init({loadMaps: true}))
-            .pipe(uglify(oldModuleOptions))
-            .pipe(sourcemaps.write("./"))
-            .pipe(gulp.dest("build/workers"))
-      }));
-}));
-
-//Polyfills that work with only ES3
-gulp.task("polyfillsEs3", function() {
-    return gulp.src("src/polyfills/es3/*.ts")
-                .pipe(sourcemaps.init({loadMaps: true}))
-                .pipe(ts({
-                    noImplicitAny: true,
-                    target: "ES3",
-                    module: "commonjs",
-                    removeComments: true,
-                    sourceMap: false
-                }))
-                .pipe(uglify(oldModuleOptions))
-                .pipe(sourcemaps.write("./"))
-                .pipe(gulp.dest("build/polyfills/es3"));
-});
-//Polyfills that require ES5 features
-gulp.task("polyfillsEs5", function() {
-    return gulp.src("src/polyfills/es5/*.ts")
-                .pipe(sourcemaps.init({loadMaps: true}))
-                .pipe(ts({
-                    noImplicitAny: true,
-                    target: "ES5",
-                    module: "commonjs",
-                    removeComments: true,
-                    sourceMap: false
-                }))
-                .pipe(uglify(oldModuleOptions))
-                .pipe(sourcemaps.write("./"))
-                .pipe(gulp.dest("build/polyfills/es5"));
-});
-
-gulp.task("polyfills", gulp.parallel("polyfillsEs3", "polyfillsEs5"));
+gulp.task("workerCode", gulp.series("compileWorkerCode", "compileServiceWorkerCode"));
 
 gulp.task("compileBytecode", function(done) {
     exec("cd src && make.bat", function (err, stdout, stderr) {
@@ -223,57 +124,7 @@ gulp.task("compileBytecode", function(done) {
     });
 });
 
-gulp.task("scripts", gulp.parallel("moduleCode", "polyfills",
-    gulp.series("compileNoModuleCode", gulp.parallel("noModuleCode", "workerCode"))));
-
-const responsiveImageConfig = [{
-    width: "25%",
-    rename: {
-        suffix: "-quarter"
-    }
-},
-{
-    width: "50%",
-    rename: {
-        suffix: "-half"
-    }
-},
-{
-    width: "75%",
-    rename: {
-        suffix: "-most"
-    }
-},
-{
-    width: "100%"
-},
-{
-    width: "25%",
-    rename: {
-        suffix: "-quarter",
-        extname: ".webp"
-    }
-},
-{
-    width: "50%",
-    rename: {
-        suffix: "-half",
-        extname: ".webp"
-    }
-},
-{
-    width: "75%",
-    rename: {
-        suffix: "-most",
-        extname: ".webp"
-    }
-},
-{
-    width: "100%",
-    rename: {
-        extname: ".webp"
-    }
-}];
+gulp.task("scripts", gulp.parallel("moduleCode", "workerCode"));
 
 /**
  * Adds a warning to outdated and JavaScript-disabled browsers as to why parts of the page don't work.
@@ -524,19 +375,11 @@ gulp.task("cleanModules", function() {
     return del("build/modules");
 });
 
-gulp.task("cleanNoModules", function() {
-    return del("build/noModules");
-});
-
-gulp.task("cleanPolyfills", function() {
-    return del("build/polyfills");
-});
-
 gulp.task("cleanWorkers", function() {
     return del("build/workers");
 });
 
-gulp.task("cleanScripts", gulp.parallel("cleanModules", "cleanNoModules", "cleanPolyfills", "cleanWorkers"));
+gulp.task("cleanScripts", gulp.parallel("cleanModules", "cleanWorkers"));
 
 gulp.task("fullClean", function() {
     return del("build");
@@ -548,12 +391,10 @@ gulp.task("fullBuild", gulp.series("fullClean", gulp.parallel("scripts",
     gulp.series("generate-favicon", "html", "media")), "css", "cacheBust"));
 
 gulp.task("watch", function () {
-    gulp.watch("src/*.ts", gulp.parallel("moduleCode", gulp.series("compileNoModuleCode", "noModuleCode")));
-    gulp.watch("src/modules/*.ts", gulp.parallel("newModules", gulp.series("compileNoModuleCode", "noModuleCode")));
-    gulp.watch("src/workers/*.ts", gulp.series("cleanWorkers", "compileNoModuleCode", "workerCode"));
+    gulp.watch("src/*.ts", gulp.parallel("moduleCode"));
+    gulp.watch("src/modules/*.ts", gulp.parallel("newModules"));
+    gulp.watch("src/workers/*.ts", gulp.series("cleanWorkers", "workerCode"));
     gulp.watch("src/serviceWorker/*.ts", gulp.series("cleanWorkers", "workerCode"));
-    gulp.watch("src/polyfills/es3/*.ts", gulp.series("polyfillsEs3"));
-    gulp.watch("src/polyfills/es5/*.ts", gulp.series("polyfillsEs5"));
     gulp.watch("src/*/*.css", gulp.series("css"));
     gulp.watch("src/*/*.html", gulp.series("html"));
 });
