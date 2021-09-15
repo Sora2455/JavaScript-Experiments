@@ -109,6 +109,9 @@ gulp.task("compileWorkerCode", function() {
                         "scripthost"
                     ]
                 }))
+                //Use absolute URLs instead of relative ones so that the cache-busting code
+                //can find them
+                .pipe(replace('"../modules/', '"/modules/modules/'))
                 .pipe(uglify(newModuleOptions))
                 .pipe(sourcemaps.write("./"))
                 .pipe(gulp.dest("build/workers"));
