@@ -18,5 +18,8 @@ onmessage = (ev) => {
         model.addData(sText);
         model.make();
         postMessage(model);
+    } else if (ev.data === "marco") {
+        // Confirming that we loaded successfully
+        postMessage("polo");
     }
 };

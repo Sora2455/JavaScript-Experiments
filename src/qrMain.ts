@@ -100,6 +100,18 @@ new ReadyManager().whenReady(() => {
     const QRCodeInput = document.getElementById("QRCodeInput") as HTMLInputElement;
     const QRCodeResult = document.getElementById("QRCodeResult") as HTMLDivElement;
     if (QRCodeInput && QRCodeResult) {
+        const urlInputValue = new URL(location.href).searchParams.get("QRCode");
+        if (urlInputValue) {
+            // Fallback was used - handle as gracefully as we can
+            QRCodeInput.value = urlInputValue;
+            const qrCodeImage = document.createElement("img");
+            qrCodeImage.src = "qrCode.png";
+            qrCodeImage.alt = `The QR Code for the value '${urlInputValue}'`;
+            qrCodeImage.title = `The QR Code for the value '${urlInputValue}'`;
+            qrCodeImage.height = 360;
+            qrCodeImage.width = 360;
+            QRCodeResult.parentElement.insertAdjacentElement("beforeend", qrCodeImage);
+        }
         const htOption = {
             colorDark: "#000000",
             colorLight: "#ffffff",
@@ -107,11 +119,9 @@ new ReadyManager().whenReady(() => {
             typeNumber: 4
         } as IHtOption;
         const drawer = new TableDrawer(QRCodeResult, htOption);
-        const qrCodeWorker = new Worker("workers/QRCodeRenderer.js");
-        qrCodeWorker.onmessage = (ev) => {
-            const qrCode = ev.data as IQRCodeModel;
-            drawer.draw(qrCode);
-        };
+        const qrCodeWorker = new Worker("workers/QRCodeRenderer.js", {
+            type: "module"
+        });
         let lastQrValue = QRCodeInput.value;
         if (QRCodeInput.value) {
             QRCodeResult.title = QRCodeInput.value;
@@ -134,21 +144,33 @@ new ReadyManager().whenReady(() => {
                 drawer.clear();
             }
         };
-        QRCodeInput.oninput = onChange;
-        QRCodeInput.onchange = onChange;
-        QRCodeResult.onclick = () => {
-            copyTextToClipboard(QRCodeInput.value);
+        const replaceServerGenerationWithClientSide = () => {
+            QRCodeInput.oninput = onChange;
+            QRCodeInput.onchange = onChange;
+            QRCodeResult.onclick = () => {
+                copyTextToClipboard(QRCodeInput.value);
+            };
+            const twentyRem = (20 * getRootElementFontSize()).toString() + "px";
+            QRCodeResult.style.width = QRCodeResult.style.height = twentyRem;
+            // let screen readers know this is an image
+            QRCodeResult.setAttribute("role", "img");
+    
+            // hide the generate button
+            document.getElementById("QRCodeGenerate").style.display = "none";
+            // don't reload the iFrame on form submission (like the enter key, for example)
+            document.getElementById("QRCodeFrom").onsubmit = () => {
+                return false;
+            };
         };
-        const twentyRem = (20 * getRootElementFontSize()).toString() + "px";
-        QRCodeResult.style.width = QRCodeResult.style.height = twentyRem;
-        // let screen readers know this is an image
-        QRCodeResult.setAttribute("role", "img");
 
-        // hide the generate button
-        document.getElementById("QRCodeGenerate").style.display = "none";
-        // don't reload the iFrame on form submission (like the enter key, for example)
-        document.getElementById("QRCodeFrom").onsubmit = () => {
-            return false;
+        qrCodeWorker.onmessage = (ev: MessageEvent<IQRCodeModel | "polo">) => {
+            if (ev.data === "polo") {
+                // The worker's confirmed that its ready, set everything up
+                replaceServerGenerationWithClientSide();
+            } else {
+                drawer.draw(ev.data);
+            }
         };
+        qrCodeWorker.postMessage("marco");
     }
 });
