@@ -50,6 +50,12 @@ if (typeof IntersectionObserver === "function") {
     observer = new IntersectionObserver(onIntersection, config);
 }
 const tempImg = "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==";
+let lowData = false;
+if (navigator.connection) {
+  lowData = navigator.connection.saveData === true ||
+    navigator.connection.effectiveType === "slow-2g" ||
+    navigator.connection.effectiveType === "2g";
+}
 /**
  * Temporarily replace a expensive resource load with a cheap one
  */
@@ -183,12 +189,6 @@ function insertAfter(newNode: Node, referenceNode: Node): void {
  * @param lazyArea The area to check video tags in
  */
 function setVideoFallback(lazyArea: DocumentFragment) {
-  let lowData = false;
-  if (navigator.connection) {
-    lowData = navigator.connection.saveData === true ||
-      navigator.connection.effectiveType === "slow-2g" ||
-      navigator.connection.effectiveType === "2g";
-  }
   // DocumentFragments don't support getElementsByTagName
   const lazyVideos = lazyArea.querySelectorAll("video");
   for (let i = lazyVideos.length; i--;) {
