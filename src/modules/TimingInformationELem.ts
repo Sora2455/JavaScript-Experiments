@@ -36,13 +36,18 @@ if ("customElements" in self) {
             };
 
             const shadow = this.attachShadow({mode: "open"});
-            const content = document.createElement("div");
 
             const pageTiming = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
             const domReadyTime = pageTiming.domContentLoadedEventEnd - pageTiming.requestStart;
 
             const lastModifiedDate = new Date(document.lastModified);
-            const lastModifiedLocaleString = lastModifiedDate.toLocaleString(locales);
+            const lastModifiedLocaleString = lastModifiedDate.toLocaleString(locales, {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "numeric",
+                minute: "2-digit"
+            });
             const lastModifiedIsoString = lastModifiedDate.toISOString();
 
             const serverTiming = (pageTiming as any).serverTiming as PerformanceServerTiming[];
@@ -66,16 +71,34 @@ if ("customElements" in self) {
                 }
             }
 
-            content.innerHTML = "<dl>" +
-                "<dt>Page load time</dt>" +
-                "<dd>" + getTimeInSecondsSecondsString(domReadyTime) + "</dd>" +
-                "<dt>Time spent in database</dt>" +
-                "<dd>" + getTimeInSecondsSecondsString(databaseTime) + "</dd>" +
-                "<dt>Time spent generating page</dt>" +
-                "<dd>" + getTimeInSecondsSecondsString(generationTime) + "</dd>" +
-                "<dt>Page last modified</dt>" +
-                "<dd><time datetime=" + lastModifiedIsoString + ">" + lastModifiedLocaleString + "</time></dd>" +
-            "</dl>";
+            const addDt = (text: string, dl: HTMLDListElement) => {
+                const dt = document.createElement("dt");
+                dt.textContent = text;
+                dl.appendChild(dt);
+            }
+
+            const addDd = (text: string, dl: HTMLDListElement) => {
+                const dd = document.createElement("dd");
+                dd.textContent = text;
+                dl.appendChild(dd);
+            }
+
+            const content = document.createElement("dl");
+            addDt("Page load time", content);
+            addDd(getTimeInSecondsSecondsString(domReadyTime), content);
+            addDt("Time spent in database", content);
+            addDd(getTimeInSecondsSecondsString(databaseTime), content);
+            addDt("Time spent generating page", content);
+            addDd(getTimeInSecondsSecondsString(generationTime), content);
+            addDt("Page last modified", content);
+
+            const dateElem = document.createElement("time");
+            dateElem.setAttribute("datetime", lastModifiedIsoString);
+            dateElem.textContent = lastModifiedLocaleString;
+            const dd = document.createElement("dd");
+            dd.appendChild(dateElem);
+            content.appendChild(dd);
+
             shadow.appendChild(content);
         }
     }
