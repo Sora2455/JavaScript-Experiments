@@ -89,7 +89,7 @@ function handleDynamicImages (req, reply) {
 
 function return1x1pxPng(reply) {
     const image = make(1, 1);
-    encodePNGToStream(image, reply.res);
+    encodePNGToStream(image, reply.raw);
 }
 
 function setNoCache(res) {
@@ -118,7 +118,7 @@ function drawQrCode(reply, codeString) {
         }
     }
 
-    encodePNGToStream(image, reply.res);
+    encodePNGToStream(image, reply.raw);
 }
 
 function reflectJson(req, reply) {
