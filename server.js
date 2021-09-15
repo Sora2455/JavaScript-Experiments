@@ -48,6 +48,7 @@ function setHeaders(res, path, stat){
     if (path.endsWith(".html")) {
         res.setHeader("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; " +
             "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self';");
+            //"trusted-types; require-trusted-types-for 'script';"); TODO implement after cleaning up LazyLoad, SafeComments
         res.setHeader("Referrer-Policy", "same-origin");
         res.setHeader("Permissions-Policy", "sync-xhr=(), sync-script=(), legacy-image-formats=(), " +
             "accelerometer=(), ambient-light-sensor=(), camera=(), gyroscope=(), " +
