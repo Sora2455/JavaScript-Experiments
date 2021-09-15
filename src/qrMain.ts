@@ -107,7 +107,7 @@ new ReadyManager().whenReady(() => {
             const qrCodeImage = document.createElement("img");
             qrCodeImage.src = "qrCode.png";
             qrCodeImage.alt = `The QR Code for the value '${urlInputValue}'`;
-            qrCodeImage.title = `The QR Code for the value '${urlInputValue}'`;
+            qrCodeImage.title = urlInputValue;
             qrCodeImage.height = 360;
             qrCodeImage.width = 360;
             QRCodeResult.parentElement.insertAdjacentElement("beforeend", qrCodeImage);
