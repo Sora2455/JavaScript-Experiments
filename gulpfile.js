@@ -46,7 +46,8 @@ gulp.task("newModules", function(){
                     target: "ES2015",
                     module: "ES2015",
                     removeComments: true,
-                    sourceMap: false
+                    sourceMap: false,
+                    strictNullChecks: true
                 }))
                 //Use absolute URLs instead of relative ones so that the cache-busting code
                 //can find them
@@ -64,7 +65,8 @@ gulp.task("moduleCode", gulp.series("newModules", function(){
                     target: "ES2015",
                     module: "ES2015",
                     removeComments: true,
-                    sourceMap: false
+                    sourceMap: false,
+                    strictNullChecks: true
                 }))
                 //Use absolute URLs instead of relative ones so that the cache-busting code
                 //can find them
@@ -83,6 +85,7 @@ gulp.task("compileServiceWorkerCode", function() {
 		            module: "es2015",
                     removeComments: true,
                     sourceMap: false,
+                    strictNullChecks: true,
                     lib: [
                         "webworker",
                         "es6",
@@ -103,6 +106,7 @@ gulp.task("compileWorkerCode", function() {
                     module: "es2015",
                     removeComments: true,
                     sourceMap: false,
+                    strictNullChecks: true,
                     lib: [
                         "webworker",
                         "es6",

@@ -1,5 +1,5 @@
 interface IPendingSend {
-    id?: number;
+    id: number;
     jsonString: string;
     endpoint: string;
 }

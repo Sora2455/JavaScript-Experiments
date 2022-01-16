@@ -30,7 +30,7 @@ function getUniqueId(prefix?: string) {
 const zws = "\u200B";
 
 export class AutoCompleteSearch {
-    private static defaultOptions: IAutoSearchOptions = {
+    private static defaultOptions = {
         minLength: 3,
         searchDelay: 500,
         startingResults: [] as ISearchResult[]
@@ -96,7 +96,7 @@ export class AutoCompleteSearch {
         // so we should leave that alone and only take the option elements out
         const options = this.dataList.querySelectorAll("option");
         for (let i = options.length; i--;) {
-            options[i].parentElement.removeChild(options[i]);
+            options[i].remove();
         }
         const newResults = document.createDocumentFragment();
         const usuedLabels = {} as IStringUsedDictionary;

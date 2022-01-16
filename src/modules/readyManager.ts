@@ -297,7 +297,7 @@ export class ReadyManager {
     public addPolyfill(item: IFeature[]): boolean {
         let allLoading = true;
         // don't try to add polyfills on node!
-        if (document.baseURI && document.baseURI.indexOf("http") === -1) { return; }
+        if (document.baseURI && document.baseURI.indexOf("http") === -1) { return false; }
         item.forEach((i) => {
             // if the item is already loaded/loading, or is implementated natively, don't bother
             if (i.test() || i.loaded) { return; }
@@ -318,17 +318,9 @@ export class ReadyManager {
             i.loaded = true;
             const script = document.createElement("script");
             script.onload = () => {
-                script.onload = script.onreadystatechange = null;
+                script.onload = null;
                 this.polyfillLoaded();
             };
-            // startpolyfill (compiler directive)
-            script.onreadystatechange = () => {
-                if (script.readyState === "loaded" || script.readyState === "complete") {
-                    script.onload = script.onreadystatechange = null;
-                    this.polyfillLoaded();
-                }
-            };
-            // endpolyfill
             script.onerror = () => {
                 // todo run fallback action at this point
             };
@@ -377,22 +369,21 @@ export class ReadyManager {
 
     private runAction(action: IAction): void {
         // we run actions in a timeout so that errors inside them do not kill the whole program
-        if (action.fallbackAction && action.canBeLoaded) {
+        const fallback = action.fallbackAction;
+        if (fallback && action.canBeLoaded) {
             // run the action with a fallback if things go wrong
             setTimeout(() => {
                 try {
                     action.action();
                 } catch (e) {
-                    action.fallbackAction();
+                    fallback();
                     // rethrow the error so that it shows up in logging
                     throw e;
                 }
             }, 1);
-        } else if (action.fallbackAction && !action.canBeLoaded) {
+        } else if (fallback && !action.canBeLoaded) {
             // if we need features that can't be polyfilled, run the fallback
-            setTimeout(() => {
-                action.fallbackAction();
-            }, 1);
+            setTimeout(fallback);
         } else if (action.canBeLoaded) {
             // no fallback, just run the main function
             setTimeout(() => {

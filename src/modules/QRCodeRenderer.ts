@@ -168,15 +168,15 @@ export class QRCodeModel {
     }
     private typeNumber: number;
     private errorCorrectLevel: number;
-    private modules: boolean[][];
+    private modules: (boolean | null)[][];
     private moduleCount: number;
-    private dataCache: number[];
+    private dataCache: number[] | null;
     private dataList: QR8bitByte[];
 
     constructor(typeNumber: number, errorCorrectLevel: number) {
         this.typeNumber = typeNumber;
         this.errorCorrectLevel = errorCorrectLevel;
-        this.modules = null;
+        this.modules = [];
         this.moduleCount = 0;
         this.dataCache = null;
         this.dataList = [];
@@ -184,7 +184,7 @@ export class QRCodeModel {
     public getModuleCount(): number {
         return this.moduleCount;
     }
-    public isDark(row: number, col: number): boolean {
+    public isDark(row: number, col: number): boolean | null {
         if (row < 0 || this.moduleCount <= row || col < 0 || this.moduleCount <= col) {
             throw new Error(row + "," + col);
         }
@@ -847,7 +847,7 @@ class QRRSBlock {
         [34, 54, 24, 34, 55, 25],
         [20, 45, 15, 61, 46, 16]
     ];
-    private static getRsBlockTable(typeNumber: number, errorCorrectLevel: QRErrorCorrectLevel): number[] {
+    private static getRsBlockTable(typeNumber: number, errorCorrectLevel: QRErrorCorrectLevel): number[] | undefined {
         switch (errorCorrectLevel) {
             case QRErrorCorrectLevel.L:
                 return QRRSBlock.RS_BLOCK_TABLE[(typeNumber - 1) * 4 + 0];

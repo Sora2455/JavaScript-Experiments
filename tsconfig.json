@@ -1,7 +1,10 @@
 {
 	"compilerOptions": {
-		"target": "es2015",
-		"module": "amd",
-		"sourceMap": true
+		"noImplicitAny": true,
+		"target": "ES2015",
+		"module": "es2015",
+		"removeComments": true,
+		"sourceMap": false,
+		"strictNullChecks": true
 	}
 }

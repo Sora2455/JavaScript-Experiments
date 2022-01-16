@@ -200,7 +200,7 @@ interface IAsmModule {
  * @param callback A callback function that will be called with the module exports (or null, if there was an error)
  */
 function loadAsmJs(url: string, imports: any, buffer: ArrayBuffer,
-                   callback: (module: IModuleExports) => void): void {
+                   callback: (module: IModuleExports | null) => void): void {
     // Set up initialisation paramatars
     self.Module = {
         mem: new ArrayBuffer(0),

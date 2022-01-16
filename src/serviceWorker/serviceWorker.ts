@@ -17,7 +17,9 @@ async function cacheCopy(source: string, destination: string): Promise<void[]> {
     const requests = await sourceCache.keys();
     return Promise.all(requests.map((request) => {
         return sourceCache.match(request).then((response) => {
-            return destCache.put(request, response);
+            if (response){
+                return destCache.put(request, response);
+            }
         });
     }));
 }

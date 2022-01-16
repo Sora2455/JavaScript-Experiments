@@ -1,19 +1,3 @@
-// tslint:disable-next-line:interface-name
-interface PerformanceServerTiming {
-    /**
-     * A DOMString value of the server-specified metric description, or an empty string.
-     */
-    description: string;
-    /**
-     * A double that contains the server-specified metric duration, or value 0.0.
-     */
-    duration: number;
-    /**
-     * A DOMString value of the server-specified metric name.
-     */
-    name: string;
-}
-
 if ("customElements" in self) {
     class TimingInformation extends HTMLElement {
         constructor() {
@@ -21,7 +5,7 @@ if ("customElements" in self) {
             super();
 
             const locales = navigator.languages.concat([document.documentElement.lang]);
-            const getTimeInSecondsSecondsString = (timeInMilliseconds: number) => {
+            const getTimeInSecondsSecondsString = (timeInMilliseconds: number | null) => {
                 if (typeof timeInMilliseconds !== "number") { return "unknown"; }
                 const timeInSeconds = timeInMilliseconds / 1000;
                 return timeInSeconds.toLocaleString(locales,

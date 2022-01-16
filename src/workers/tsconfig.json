@@ -5,6 +5,7 @@
         "sourceMap": true,
         "noImplicitAny": true,
         "removeComments": true,
+		"strictNullChecks": true,
         "lib": [
             "webworker",
             "es6",

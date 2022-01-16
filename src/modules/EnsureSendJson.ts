@@ -13,7 +13,7 @@ interface IPendingSendCallbacks {
     [id: number]: (result: any, statusCode: number) => void;
 }
 interface IPendingSend {
-    id?: number;
+    id: number;
     jsonString: string;
     endpoint: string;
 }
@@ -31,7 +31,7 @@ const syncTag = "sendJSON";
 const messageEventType = "syncCompleted";
 const storageKey = "sendJSON-outbox";
 
-let dbConnection: IDBDatabase;
+let dbConnection: IDBDatabase | null;
 const supportsStorageEvents = typeof self.onstorage !== "undefined";
 const supportsIndexedDb = typeof indexedDB === "object";
 const supportsSyncManager = typeof SyncManager === "function";
@@ -67,7 +67,7 @@ export function postJson(endpoint: string, jsonString: string,
  */
 function openDb(openCallback?: (db: IDBDatabase) => void,
                 errorCallback?: () => void): void {
-    if (dbConnection instanceof IDBDatabase) {
+    if (dbConnection instanceof IDBDatabase && openCallback) {
         openCallback(dbConnection);
         return;
     }
@@ -303,7 +303,7 @@ function trySendOutbox(): void {
     if (self.navigator.serviceWorker) {
         // If possible, let the service worker handle this (as then we avoid multi-thread issues)
         self.navigator.serviceWorker.ready.then((reg) => {
-            reg.active.postMessage(syncTag);
+            reg.active?.postMessage(syncTag);
         });
     } else if (supportsIndexedDb) {
         // Otherwise we have to hope that we are the only tab open for this origin

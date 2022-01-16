@@ -62,13 +62,13 @@ if (navigator.connection) {
 function storeSourceForLater(lazyItem: Element, tempData: string): void {
     if (lazyItem.hasAttribute("src")) {
         // store our ACTUAL source for later
-        lazyItem.setAttribute("data-lazy-src", lazyItem.getAttribute("src"));
+        lazyItem.setAttribute("data-lazy-src", lazyItem.getAttribute("src") as string);
         // set the item to point to a temporary replacement (like a data URI)
         lazyItem.setAttribute("src", tempData);
     }
     if (lazyItem.hasAttribute("poster")) {
         // the video element has a 'poster' attribute that shows an image while loading
-        lazyItem.setAttribute("data-lazy-poster", lazyItem.getAttribute("poster"));
+        lazyItem.setAttribute("data-lazy-poster", lazyItem.getAttribute("poster") as string);
         lazyItem.setAttribute("poster", tempData);
     }
     // now observe the item so that we can start loading when it gets close to the viewport
@@ -141,18 +141,18 @@ function prepareLazyContents(lazyArea: DocumentFragment): void {
  */
 function restoreSource(lazyItem: Element): void {
     if (lazyItem.hasAttribute("data-lazy-src")) {
-        lazyItem.setAttribute("src", lazyItem.getAttribute("data-lazy-src"));
+        lazyItem.setAttribute("src", lazyItem.getAttribute("data-lazy-src") as string);
         lazyItem.removeAttribute("data-lazy-src");
     }
     if (lazyItem.hasAttribute("data-lazy-poster")) {
-        lazyItem.setAttribute("poster", lazyItem.getAttribute("data-lazy-poster"));
+        lazyItem.setAttribute("poster", lazyItem.getAttribute("data-lazy-poster") as string);
         lazyItem.removeAttribute("data-lazy-poster");
     }
 }
 /**
  * Remove the source tag preventing the loading of picture/audio/video
  */
-function removeJammingSource(lazyItem: Element): void {
+function removeJammingSource(lazyItem: HTMLPictureElement): void {
     const jammingSource = lazyItem.querySelector("source[data-lazy-remove]");
     if (jammingSource) { lazyItem.removeChild(jammingSource); }
 }
@@ -166,7 +166,7 @@ function onIntersection(entries: IntersectionObserverEntry[], obsvr: Intersectio
         const lazyItem = entry.target;
         obsvr.unobserve(lazyItem);
         restoreSource(lazyItem);
-        if (lazyItem instanceof HTMLImageElement) {
+        if (lazyItem instanceof HTMLImageElement && lazyItem.parentElement instanceof HTMLPictureElement) {
             // just in case the img is the decendent of a picture element, check for source tags
             removeJammingSource(lazyItem.parentElement);
         } else if (lazyItem instanceof HTMLVideoElement || lazyItem instanceof HTMLAudioElement) {
@@ -181,7 +181,7 @@ function onIntersection(entries: IntersectionObserverEntry[], obsvr: Intersectio
  * @param referenceNode The node to insert it after
  */
 function insertAfter(newNode: Node, referenceNode: Node): void {
-  referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+  (referenceNode.parentNode as ParentNode).insertBefore(newNode, referenceNode.nextSibling);
 }
 
 /**
@@ -224,7 +224,7 @@ function setVideoFallback(lazyArea: DocumentFragment) {
           insertAfter(childNode, lazyVideo);
         }
       }
-      lazyVideo.parentNode.removeChild(lazyVideo);
+      lazyVideo.remove();
     }
   }
 }
@@ -256,11 +256,12 @@ function setUp(): void {
         }
         setVideoFallback(lazyArea);
         // only delay loading if we can use the IntersectionObserver to check for visibility
+        const parentNode = noScriptTag.parentNode as ParentNode;
         if (!observer) {
-            noScriptTag.parentNode.replaceChild(lazyArea, noScriptTag);
+            parentNode.replaceChild(lazyArea, noScriptTag);
         } else {
             prepareLazyContents(lazyArea);
-            noScriptTag.parentNode.replaceChild(lazyArea, noScriptTag);
+            parentNode.replaceChild(lazyArea, noScriptTag);
         }
     }
 }

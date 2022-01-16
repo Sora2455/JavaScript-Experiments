@@ -56,7 +56,7 @@ interface ICommentData {
      */
     class SafeComments extends HTMLElement {
         private content: HTMLIFrameElement;
-        private resizeObserver: ResizeObserver;
+        private resizeObserver: ResizeObserver | null;
         private loadingFromUrl: string;
         // Specify observed attributes so that
         // attributeChangedCallback will work
@@ -101,7 +101,7 @@ interface ICommentData {
         }
 
         protected disconnectedCallback() {
-            if (typeof ResizeObserver === "function") {
+            if (this.resizeObserver) {
                 this.resizeObserver.disconnect();
                 this.resizeObserver = null;
             } else {
@@ -120,10 +120,10 @@ interface ICommentData {
          */
         private setCommentData() {
             if (this.hasAttribute("comment-data")) {
-                const commentData = JSON.parse(this.getAttribute("comment-data"));
+                const commentData = JSON.parse(this.getAttribute("comment-data") as string);
                 this.writeCommentsIntoIFrame(commentData);
             } else if (this.hasAttribute("comment-url")) {
-                const commentUrl = this.getAttribute("comment-url");
+                const commentUrl = this.getAttribute("comment-url") as string;
                 if (this.loadingFromUrl !== commentUrl) {
                     this.loadingFromUrl = commentUrl;
                     fetch(commentUrl)
@@ -214,8 +214,9 @@ interface ICommentData {
          * Change iframe height to match its contents
          */
         private setIFrameHeight() {
-            if (this.content.contentDocument.body) {
-                this.content.height = (this.content.contentDocument.body.offsetHeight + 25).toString();
+            const innerDocument = this.content.contentDocument;
+            if (innerDocument && innerDocument.body) {
+                this.content.height = (innerDocument.body.offsetHeight + 25).toString();
             }
         }
 

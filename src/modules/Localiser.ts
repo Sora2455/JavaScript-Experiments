@@ -3,9 +3,9 @@ import {ReadyManager} from "./readyManager.js";
 // to anyone forking this library: you most likely will want to edit the below two lines
 const authorLanguage = "en-AU";
 export const authorCurrency = "AUD";
-const documentLanguage = document.getElementsByTagName("html")[0].getAttribute("lang");
+const documentLanguage = document.getElementsByTagName("html")[0].getAttribute("lang") as string;
 // try and use native language formatting, falling back to the langauge of the document, then the author
-const locales = [navigator.language, documentLanguage, authorLanguage];
+const locales = navigator.languages.concat(documentLanguage, authorLanguage);
 let timeFormatter: Intl.DateTimeFormat;
 let dateFormatter: Intl.DateTimeFormat;
 let dateTimeFormatter: Intl.DateTimeFormat;
@@ -44,6 +44,10 @@ function localiseTimes() {
         const dateObj = new Date(Date.UTC(1900, 1));
         // get the datetime property of the time tag
         const dateTimeString = time.getAttribute("datetime");
+        if (!dateTimeString){
+            time.textContent = "";
+            return;
+        }
         if (dateTimeString.indexOf("-") !== -1) {
             // date with possible time
             const [dateString, timeString] = dateTimeString.split("T");
@@ -124,7 +128,7 @@ function tryAddShareButton() {
             document.querySelectorAll("page-share a[href^='https://twitter.com']") as NodeListOf<HTMLAnchorElement>;
         const canonicalUrlElem = document.querySelector("link[rel=canonical]") as HTMLLinkElement;
         const url = canonicalUrlElem ? canonicalUrlElem.href : location.href;
-        const description = document.querySelector("meta[name='Description']").getAttribute("content");
+        const description = document.querySelector("meta[name='Description']")?.getAttribute("content") ?? "";
         const fixedTwitterLink = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`
             + `&text=${encodeURIComponent(description)}`;
         for (let i = twitterShareLinks.length; i--;) {
@@ -140,6 +144,6 @@ function shareCurrentPage() {
     const title = document.title;
     const canonicalUrlElem = document.querySelector("link[rel=canonical]") as HTMLLinkElement;
     const url = canonicalUrlElem ? canonicalUrlElem.href : location.href;
-    navigator.share({title, url});
-    // TODO page description as text?
+    const text = document.querySelector("meta[name='Description']")?.getAttribute("content") ?? undefined;
+    navigator.share({title, url, text});
 }
