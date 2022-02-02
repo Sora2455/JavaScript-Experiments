@@ -391,13 +391,7 @@ if (supportsIndexedDb && self.document && self.document.visibilityState === "vis
 if (!supportsSyncManager) {
     // For users that don't have background sync, try sending if
     // the internet reconnects while the page is still loaded
-    // startpolyfill (compiler directive)
-    if (self.addEventListener) {
-        // endpolyfill
-        self.addEventListener("online", trySendOutbox);
-        // startpolyfill (compiler directive)
-    }
-    // endpolyfill
+    self.addEventListener("online", trySendOutbox);
     // Or if the page has just loaded, try sending entries in the outbox now
     (new ReadyManager()).whenLoaded(trySendOutbox);
 }

@@ -32,14 +32,10 @@ const origin = configJson.origin;
 const gifConvertOptions = "[0:v] fps=12,scale=320:-1:flags=lanczos," +
     "split [a][b];[a] palettegen [p];[b][p] paletteuse";
 
-const polyfillRegex = /\/\/ startpolyfill[\s\S]*?\/\/ endpolyfill/g;
-
 const newModuleOptions = {safari10:true};
 
 gulp.task("newModules", function(){
     return gulp.src("src/modules/*.ts")
-                //We don't need these old polyfills in modern browsers
-                .pipe(replace(polyfillRegex, ""))
                 .pipe(sourcemaps.init({loadMaps: true}))
                 .pipe(ts({
                     noImplicitAny: true,

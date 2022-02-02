@@ -18,16 +18,6 @@ function getRootElementFontSize(): number {
     );
 }
 
-interface IHtOption {
-    [key: string]: string | number | boolean | QRErrorCorrectLevel; // index defintion
-    text?: string;
-    colorLight: string;
-    colorDark: string;
-    typeNumber: number;
-    correctLevel: QRErrorCorrectLevel;
-    useSVG?: boolean;
-}
-
 interface IQRCodeModel {
     modules: boolean[][];
     moduleCount: number;
@@ -48,11 +38,9 @@ class TableDrawer {
         return model.modules[row][col];
     }
     private el: HTMLElement;
-    private htOption: IHtOption;
 
-    constructor(el: HTMLElement, htOption: IHtOption) {
+    constructor(el: HTMLElement) {
         this.el = el;
-        this.htOption = htOption;
     }
 
     /**
@@ -90,7 +78,7 @@ class TableDrawer {
      * Clear the QRCode
      */
     public clear(): void {
-        while (this.el.hasChildNodes()) {
+        while (this.el.firstChild) {
             this.el.removeChild(this.el.firstChild);
         }
     }
@@ -110,15 +98,10 @@ new ReadyManager().whenReady(() => {
             qrCodeImage.title = urlInputValue;
             qrCodeImage.height = 360;
             qrCodeImage.width = 360;
-            QRCodeResult.parentElement.insertAdjacentElement("beforeend", qrCodeImage);
+            QRCodeResult.parentElement?.insertAdjacentElement("beforeend", qrCodeImage);
         }
-        const htOption = {
-            colorDark: "#000000",
-            colorLight: "#ffffff",
-            correctLevel: QRErrorCorrectLevel.H,
-            typeNumber: 4
-        } as IHtOption;
-        const drawer = new TableDrawer(QRCodeResult, htOption);
+
+        const drawer = new TableDrawer(QRCodeResult);
         const qrCodeWorker = new Worker("workers/QRCodeRenderer.js", {
             type: "module"
         });
@@ -126,7 +109,7 @@ new ReadyManager().whenReady(() => {
         if (QRCodeInput.value) {
             QRCodeResult.title = QRCodeInput.value;
             QRCodeResult.setAttribute("aria-label", `The QR Code for the value '${QRCodeInput.value}'`);
-            qrCodeWorker.postMessage([QRCodeInput.value, htOption]);
+            qrCodeWorker.postMessage([QRCodeInput.value, QRErrorCorrectLevel.H]);
         } else {
             QRCodeResult.setAttribute("aria-label", "A blank QR Code");
         }
@@ -137,7 +120,7 @@ new ReadyManager().whenReady(() => {
             if (QRCodeInput.value) {
                 QRCodeResult.title = QRCodeInput.value;
                 QRCodeResult.setAttribute("aria-label", `The QR Code for the value '${QRCodeInput.value}'`);
-                qrCodeWorker.postMessage([QRCodeInput.value, htOption]);
+                qrCodeWorker.postMessage([QRCodeInput.value, QRErrorCorrectLevel.H]);
             } else {
                 QRCodeResult.title = "";
                 QRCodeResult.setAttribute("aria-label", "A blank QR Code");
@@ -156,9 +139,11 @@ new ReadyManager().whenReady(() => {
             QRCodeResult.setAttribute("role", "img");
     
             // hide the generate button
-            document.getElementById("QRCodeGenerate").style.display = "none";
+            const generateButton = document.getElementById("QRCodeGenerate");
+            if (generateButton) generateButton.style.display = "none";
             // don't reload the iFrame on form submission (like the enter key, for example)
-            document.getElementById("QRCodeFrom").onsubmit = () => {
+            const qrCodeForm = document.getElementById("QRCodeFrom");
+            if (qrCodeForm) qrCodeForm.onsubmit = () => {
                 return false;
             };
         };

@@ -6,10 +6,8 @@ import {loadBytecode} from "./modules/LoadBytecode.js";
 import {onBuyClicked} from "./modules/PaymentRequest.js";
 import {PrintManager} from "./modules/PrintManager.js";
 import {ReadyManager, Requirement} from "./modules/readyManager.js";
-// startnopolyfill (compiler directive)
 import "./modules/SafeComments.js";
 import "./modules/TimingInformationELem.js";
-// endnopolyfill
 
 const readyManager = new ReadyManager();
 readyManager.whenReady(() => {
@@ -77,9 +75,9 @@ readyManager.whenReady(() => {
 const printManager = new PrintManager();
 printManager.RunBeforePrint(() => {
     const visibleId = location.hash.substr(1) || "1";
-    document.getElementById(visibleId).setAttribute("data-print-subject", "");
+    document.getElementById(visibleId)?.setAttribute("data-print-subject", "");
 });
 printManager.RunAfterPrint(() => {
     const visibleId = location.hash.substr(1) || "1";
-    document.getElementById(visibleId).removeAttribute("data-print-subject");
+    document.getElementById(visibleId)?.removeAttribute("data-print-subject");
 });

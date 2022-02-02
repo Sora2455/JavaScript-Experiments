@@ -1,4 +1,3 @@
-// startnopolyfill (compiler directive)
 interface ICommentData {
     /** The name of the person who authored this comment */
     author?: string;
@@ -243,4 +242,3 @@ interface ICommentData {
 
     customElements.define("safe-comments", SafeComments);
 })(self);
-// endnopolyfill

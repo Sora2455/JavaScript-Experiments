@@ -9,17 +9,8 @@ export class PrintManager {
 
         if (typeof onbeforeprint !== "undefined") {
             // Before/After print is what we're actually after
-            // startpolyfill (compiler directive)
-            if ("addEventListener" in window) {
-            // endpolyfill
-                addEventListener("beforeprint", this.OnPrintBegin);
-                addEventListener("afterprint", this.OnPrintEnd);
-            // startpolyfill (compiler directive)
-            } else {
-                (window as any as Window).attachEvent("onbeforeprint", this.OnPrintBegin);
-                (window as any as Window).attachEvent("onafterprint", this.OnPrintEnd);
-            }
-            // endpolyfill
+            addEventListener("beforeprint", this.OnPrintBegin);
+            addEventListener("afterprint", this.OnPrintEnd);
         } else {
             // ...but Safari doesn't support them, so we use matchMedia instead
             matchMedia("print").addListener(this.OnMediaChange);

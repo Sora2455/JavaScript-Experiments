@@ -72,17 +72,8 @@ export class AutoCompleteSearch {
         this.setResults = this.setResults.bind(this);
         this.handleInput = this.handleInput.bind(this);
 
-        // startpolyfill (compiler directive)
-        if (typeof textbox.addEventListener === "function") {
-        // endpolyfill
-            textbox.addEventListener("input", this.handleInput);
-            textbox.addEventListener("change", this.handleInput);
-        // startpolyfill (compiler directive)
-        } else {
-            textbox.onchange = this.handleInput;
-            textbox.oninput = this.handleInput;
-        }
-        // endpolyfill
+        textbox.addEventListener("input", this.handleInput);
+        textbox.addEventListener("change", this.handleInput);
     }
 
     /**
@@ -92,8 +83,6 @@ export class AutoCompleteSearch {
     public setResults(results: ISearchResult[]): void {
         this.currentResults = results;
 
-        // polyfills for the datalist element insert a select element inside the datalist
-        // so we should leave that alone and only take the option elements out
         const options = this.dataList.querySelectorAll("option");
         for (let i = options.length; i--;) {
             options[i].remove();
@@ -117,9 +106,7 @@ export class AutoCompleteSearch {
         }
 
         // so put the options back were we found them
-        const optionStorageElement = this.dataList.getElementsByTagName("select")[0] || this.dataList;
-
-        optionStorageElement.appendChild(newResults);
+        this.dataList.appendChild(newResults);
     }
 
     /**
