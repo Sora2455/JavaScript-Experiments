@@ -312,16 +312,15 @@ function trySendOutbox(): void {
             const objectStore = transaction.objectStore(tableName);
             objectStore.openCursor().onsuccess = function() {
                 const cursor = this.result;
-                const call = cursor && cursor.value;
+                if (!cursor || !cursor.value) return;
+                const call = cursor.value;
                 // Iterate over each value
-                if (call) {
-                    // Attempt to re-send each call
-                    sendJson(call.endpoint, call.jsonString, false, (result, status) => {
-                        // If the call succeeded, we can remove the outbox record
-                        confirmRecordSent(call.id, result, status);
-                    });
-                    cursor.continue();
-                }
+                // Attempt to re-send each call
+                sendJson(call.endpoint, call.jsonString, false, (result, status) => {
+                    // If the call succeeded, we can remove the outbox record
+                    confirmRecordSent(call.id, result, status);
+                });
+                cursor.continue();
             };
         });
     }

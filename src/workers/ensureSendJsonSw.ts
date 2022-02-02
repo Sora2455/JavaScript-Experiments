@@ -96,6 +96,10 @@ async function sendPendingJson(): Promise<void> {
     }
 }
 
+interface SyncEvent extends ExtendableEvent {
+    readonly tag: string;
+}
+
 function onSync(ev: SyncEvent): void {
     if (ev.tag === syncTag) {
         ev.waitUntil(sendPendingJson());

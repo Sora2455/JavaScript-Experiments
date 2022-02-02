@@ -104,7 +104,7 @@ function localiseNumbers() {
  * If the Web Share API is supported, replace the Share links with one generic share button
  */
 function tryAddShareButton() {
-    if (navigator.share) {
+    if ("share" in navigator) {
         const shareAreas = document.querySelectorAll("page-share");
         for (let i = shareAreas.length; i--;) {
             const shareArea = shareAreas[i];

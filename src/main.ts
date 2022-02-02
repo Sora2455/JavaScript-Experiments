@@ -5,7 +5,7 @@ import "./modules/Localiser.js";
 import {loadBytecode} from "./modules/LoadBytecode.js";
 import {onBuyClicked} from "./modules/PaymentRequest.js";
 import {PrintManager} from "./modules/PrintManager.js";
-import {ReadyManager, Requirement} from "./modules/readyManager.js";
+import {ReadyManager} from "./modules/readyManager.js";
 import "./modules/SafeComments.js";
 import "./modules/TimingInformationELem.js";
 
@@ -22,8 +22,8 @@ readyManager.whenReady(() => {
         buyTest.onclick = onBuyClicked;
     }
 });
-readyManager.whenReady({
-    action: () => {
+readyManager.whenReady(
+    () => {
         const autocompleteTextbox = document.getElementById("autocomplete");
         if (autocompleteTextbox instanceof HTMLInputElement) {
             const suggestions = [
@@ -41,14 +41,13 @@ readyManager.whenReady({
             autoComplete.setResults(suggestions);
         }
     },
-    fallbackAction: () => {
+    () => {
         const autocompleteTextbox = document.getElementById("autocomplete");
         if (autocompleteTextbox) {
             autocompleteTextbox.outerHTML = "<p>Your browser is too old. Update it.</p>";
         }
-    },
-    requirements: [Requirement.datalist]
-});
+    }
+);
 if (navigator.serviceWorker) {
     navigator.serviceWorker.register("serviceWorker.js");
 }

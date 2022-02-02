@@ -1,3 +1,10 @@
+interface PerformanceServerTiming {
+    readonly description: string;
+    readonly duration: DOMHighResTimeStamp;
+    readonly name: string;
+    toJSON(): any;
+}
+
 if ("customElements" in self) {
     class TimingInformation extends HTMLElement {
         constructor() {

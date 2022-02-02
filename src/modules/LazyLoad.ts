@@ -181,7 +181,7 @@ function onIntersection(entries: IntersectionObserverEntry[], obsvr: Intersectio
  * @param referenceNode The node to insert it after
  */
 function insertAfter(newNode: Node, referenceNode: Node): void {
-  (referenceNode.parentNode as ParentNode).insertBefore(newNode, referenceNode.nextSibling);
+  (referenceNode.parentNode as Node).insertBefore(newNode, referenceNode.nextSibling);
 }
 
 /**
@@ -256,7 +256,7 @@ function setUp(): void {
         }
         setVideoFallback(lazyArea);
         // only delay loading if we can use the IntersectionObserver to check for visibility
-        const parentNode = noScriptTag.parentNode as ParentNode;
+        const parentNode = noScriptTag.parentNode as Node;
         if (!observer) {
             parentNode.replaceChild(lazyArea, noScriptTag);
         } else {
