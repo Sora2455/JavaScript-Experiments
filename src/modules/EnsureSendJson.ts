@@ -8,6 +8,16 @@ declare global {
          */
         commit: () => void;
     }
+
+    interface SyncManager {
+        register(tag: string): Promise<void>;
+    }
+
+    var SyncManager: SyncManager;
+
+    interface ServiceWorkerRegistration {
+        sync: SyncManager;
+    }
 }
 interface IPendingSendCallbacks {
     [id: number]: (result: any, statusCode: number) => void;

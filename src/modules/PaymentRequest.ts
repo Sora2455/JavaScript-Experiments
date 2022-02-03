@@ -22,7 +22,7 @@ function runPaymentRequest() {
                 "visa", "mastercard"
             ]
         },
-        supportedMethods: ["basic-card"]
+        supportedMethods: "basic-card"
     }] as PaymentMethodData[];
 
     // Checkout details

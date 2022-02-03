@@ -107,7 +107,8 @@ gulp.task("compileWorkerCode", function() {
                         "webworker",
                         "es6",
                         "scripthost"
-                    ]
+                    ],
+                    "rootDir": "../"
                 }))
                 //Use absolute URLs instead of relative ones so that the cache-busting code
                 //can find them
