@@ -16,6 +16,7 @@ import path from "path";
 import imagemin from "gulp-imagemin";
 import imageminWebp from "imagemin-webp";
 import ffmpeg from "fluent-ffmpeg";
+import jsonminify from "gulp-jsonminify";
 import { exec } from "child_process";
 import realFavicon from "gulp-real-favicon";
 import bust from "gulp-buster";
@@ -244,7 +245,13 @@ gulp.task("silentVideos", function(done){
     Promise.all(promises).then(() => { done(); }).catch(done);
 });
 
-gulp.task("media", gulp.parallel("mediaWebP", "mediaImages", "silentVideos"));
+gulp.task("json", function(){
+    return gulp.src("src/json/*.json")
+        .pipe(jsonminify())
+        .pipe(gulp.dest("build/json"));
+});
+
+gulp.task("media", gulp.parallel("mediaWebP", "mediaImages", "silentVideos", "json"));
 
 // Generate the icons. This task takes a few seconds to complete.
 // You should run it at least once to create the icons. Then,
@@ -399,6 +406,7 @@ gulp.task("watch", function () {
     gulp.watch("src/modules/*.ts", gulp.parallel("newModules"));
     gulp.watch("src/workers/*.ts", gulp.series("cleanWorkers", "workerCode"));
     gulp.watch("src/serviceWorker/*.ts", gulp.series("cleanWorkers", "workerCode"));
+    gulp.watch("src/json/*.json", gulp.parallel("json"));
     gulp.watch("src/*/*.css", gulp.series("css"));
     gulp.watch("src/*/*.html", gulp.series("html"));
 });
