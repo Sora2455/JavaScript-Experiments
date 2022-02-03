@@ -1,44 +1,5 @@
 import {ReadyManager} from "./readyManager.js";
 
-interface INetworkInformation {
-    /**
-     * Returns the effective bandwidth estimate in megabits per second,
-     * rounded to the nearest multiple of 25 kilobits per seconds.
-     */
-    downlink: number;
-    /**
-     * Returns the maximum downlink speed, in megabits per second (Mbps),
-     * for the underlying connection technology.
-     */
-    downlinkMax: number;
-    /**
-     * Returns the effective type of the connection meaning one of 'slow-2g', '2g', '3g', or '4g'.
-     * This value is determined using a combination of recently observed round-trip time and downlink values.
-     */
-    effectiveType: "slow-2g" | "2g" | "3g" | "4g";
-    /**
-     * Returns the estimated effective round-trip time of the current connection,
-     * rounded to the nearest multiple of 25 milliseconds.
-     */
-    rtt: number;
-    /**
-     * Returns true if the user has set a reduced data usage option on the user agent.
-     */
-    saveData: boolean;
-    /**
-     * Returns the type of connection a device is using to communicate with the network.
-     */
-    type: "bluetooth" | "cellular" | "ethernet" | "none" | "wifi" | "wimax" | "other" | "unknown";
-}
-
-// tslint:disable-next-line:interface-name
-declare global {
-    // tslint:disable-next-line:interface-name
-    interface Navigator {
-        connection: INetworkInformation;
-    }
-}
-
 const config = {
     // If the image gets within 50px in the Y axis, start the download.
     rootMargin: "50px 0px"
@@ -50,12 +11,7 @@ if (typeof IntersectionObserver === "function") {
     observer = new IntersectionObserver(onIntersection, config);
 }
 const tempImg = "data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==";
-let lowData = false;
-if (navigator.connection) {
-  lowData = navigator.connection.saveData === true ||
-    navigator.connection.effectiveType === "slow-2g" ||
-    navigator.connection.effectiveType === "2g";
-}
+const lowData = matchMedia("(prefers-reduced-data: reduce)").matches;
 /**
  * Temporarily replace a expensive resource load with a cheap one
  */
