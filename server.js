@@ -8,7 +8,6 @@ import serveStatic from 'fastify-static';
 import { make, encodePNGToStream } from 'pureimage';
 import { QRCodeModel, _getTypeNumber } from "./build/modules/modules/QRCodeRenderer.js";
 
-let ieVersion = "edge";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const server = fastify({
@@ -57,7 +56,7 @@ function setHeaders(res, path, stat){
             "image-compression;bpp=2");
         res.setHeader("X-Frame-Options", "sameorigin");
         res.setHeader("Cross-Origin-Window-Policy", "Allow-PostMessage");
-        res.setHeader("X-UA-Compatible", `IE=${ieVersion}`);
+        res.setHeader("X-UA-Compatible", "IE=edge");
     }
     res.setHeader("Cross-Origin-Resource-Policy", "same-site");
     res.setHeader("X-Content-Type-Options", "nosniff");
@@ -138,10 +137,12 @@ function readGetParamaters(url) {
 process.on("message", (m) => {
     if (m === "shutdown") {
         //A parent process has asked us to stop
-        server.close();
-    } else if (typeof m === "object") {
-        if (m.set === "ieVersion" && typeof m.value === "string") {
-            ieVersion = m.value;
-        }
+        server.close().catch((err) => {
+            console.error(err);
+            // in case it hasn't started yet:
+            server.addHook("onReady", () => {
+                server.close();
+            })
+        });
     }
 });

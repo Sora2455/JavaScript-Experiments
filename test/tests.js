@@ -1,26 +1,25 @@
-const {until, By, Key, Condition} = require("selenium-webdriver");
-const firefox = require("selenium-webdriver/firefox");
-const chrome = require("selenium-webdriver/chrome");
-const ie = require('selenium-webdriver/ie');
-const edge = require("selenium-webdriver/edge");
-const firefoxDriverPath = require("geckodriver").path;
-const chromeDriverPath = require("chromedriver").path;
-const ieDriverPath = require('iedriver').path;
-const edgeDriverPath = require("edgedriver").path;
-const { fork } = require('child_process');
-const {promisify} = require('util')
-const fs = require("fs");
+"use strict";
+import {until, By, Key, Condition, Builder, Browser} from "selenium-webdriver";
+import firefox from "selenium-webdriver/firefox.js";
+import chrome from "selenium-webdriver/chrome.js";
+import "geckodriver";
+import "chromedriver";
+import { fork } from "child_process";
+import { promisify } from "util";
+import fs from "fs";
 const fs_WriteFile = promisify(fs.writeFile);
-const {describe, before, after, it} = require("mocha");
-const {assert} = require("chai");
+import {describe, before, after, it} from "mocha";
 
-const siteUrl = "http://localhost:8080/";
-const browsers = ["Firefox", "Chrome", "IE8", "IE9", "IE10", "IE11", "Edge", "noscript"];
+// Folder where the ffmeg binaries are stored
+const configJson = JSON.parse(fs.readFileSync("config.json"));
+
+const siteUrl = "https://localhost:8080/";
+const browsers = ["Firefox", "Chrome", "noscript"];
 let server;
 let messageServer;
 //TODO fix broken tests
-describe("Cross-browser testing", async function() {
-    before(async function() {
+describe("Cross-browser testing", function() {
+    before(function startUpServer() {
         server = fork("server.js");
         messageServer = function(value) {
             return new Promise(function(resolve, reject) {
@@ -32,7 +31,7 @@ describe("Cross-browser testing", async function() {
         }
     });
 
-    after(async function() {
+    after(async function closeServer() {
         await messageServer("shutdown");
         server.disconnect();
     });
@@ -41,27 +40,14 @@ describe("Cross-browser testing", async function() {
         const browser = browsers[i];
         let driver;
 
-        describe(`General site tests - ${browser}`, async function() {
+        describe(`General site tests - ${browser}`, function() {
             this.timeout(60000);
-            before(async function() {
-                let version = "edge";
-                switch (browser) {
-                    case "IE8":
-                        version = "8";
-                        break;
-                    case "IE9":
-                        version = "9";
-                        break;
-                    case "IE10":
-                        version = "10";
-                        break;
-                }
-                await messageServer({set: "ieVersion", value: version});
-                driver = await getBrowserSession(browsers[i]);
+            before(function getBrowserDriver() {
+                driver = getBrowserSession(browsers[i]);
             });
-    
-            after(async function() {
-                await driver.quit();
+
+            after(function closeDriver() {
+                driver.quit();
             });
 
             it("Can access the test site", async function() {
@@ -83,13 +69,13 @@ describe("Cross-browser testing", async function() {
                     await driver.findElement(By.id("QRCodeResult")).click();
                 }
                 await driver.switchTo().defaultContent();
-                await saveScreenshot(driver, `Main - ${browser}`);
+                await saveScreenshot(driver, `${browser} - 1 Main`);
             });
 
             it("Can see the second section", async function() {
                 await driver.get(`${siteUrl}#2`);
                 await driver.manage().window().maximize();
-                await saveScreenshot(driver, `Second - ${browser}`);
+                await saveScreenshot(driver, `${browser} - 2 Second`);
             });
 
             it("Can see the third section", async function() {
@@ -97,7 +83,7 @@ describe("Cross-browser testing", async function() {
                 await driver.manage().window().maximize();
                 const lazyImage = By.css("img[src='/media/you-have-gone-back-in-time.jpg']");
                 await untilImageIsLoaded(driver, lazyImage);
-                await saveScreenshot(driver, `Third - ${browser}`);
+                await saveScreenshot(driver, `${browser} - 3 Third`);
             });
         });
     }
@@ -141,28 +127,37 @@ async function saveScreenshot(driver, fileName) {
  * Start up a browser session of the given type
  * @param {String} type The type of session to launch (Firefox, Chrome, IE8, noscript...)
  */
-async function getBrowserSession(type) {
+function getBrowserSession(type) {
     if (typeof type !== "string") return null;
 
     switch(type.toLocaleLowerCase()) {
         case "firefox":
             const optionsF = new firefox.Options();
-            const serviceF = new firefox.ServiceBuilder(firefoxDriverPath).build();
-            return firefox.Driver.createSession(optionsF, serviceF);
+            if (configJson.firefoxPath) {
+                optionsF.setBinary(configJson.firefoxPath)
+            }
+            optionsF.setAcceptInsecureCerts(true);//Ignore the fact that we're using a self-signed cert
+            const builderF = new Builder().forBrowser(Browser.FIREFOX);
+            builderF.setFirefoxOptions(optionsF);
+            return builderF.build();
         case "noscript":
             const optionsNs = new firefox.Options().setPreference("javascript.enabled", false);
-            const serviceNs = new firefox.ServiceBuilder(firefoxDriverPath).build();
-            return firefox.Driver.createSession(optionsNs, serviceNs);
+            if (configJson.firefoxPath) {
+                optionsNs.setBinary(configJson.firefoxPath)
+            }
+            optionsNs.setAcceptInsecureCerts(true);//Ignore the fact that we're using a self-signed cert
+            const builderNs = new Builder().forBrowser(Browser.FIREFOX);
+            builderNs.setFirefoxOptions(optionsNs);
+            return builderNs.build();
         case "chrome":
-            const optionsC = new chrome.Options();
-            const serviceC = new chrome.ServiceBuilder(chromeDriverPath).build();
-            return chrome.Driver.createSession(optionsC, serviceC);
-        case "edge":
-            const optionsE = new edge.Options();
-            const serviceE = new edge.ServiceBuilder(edgeDriverPath).build();
-            return edge.Driver.createSession(optionsE, serviceE);
+            const optionsC = new chrome.Options()
+            if (configJson.chomePath) {
+                optionsC.setChromeBinaryPath(configJson.chomePath)
+            }
+            const builderC = new Builder().forBrowser(Browser.CHROME);
+            builderC.setChromeOptions(optionsC);
+            return builderC.build();
         default:
-            const optionsI = new ie.Options().setExtractPath(ieDriverPath);
-            return ie.Driver.createSession(optionsI);
+            return null;
     }
 }

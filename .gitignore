@@ -16,7 +16,7 @@
 [Rr]elease/
 [Rr]eleases/
 build/
-test/screenshots
+test/screenshots/*.png
 src/favicon/faviconData.json
 x64/
 x86/
