@@ -9,7 +9,7 @@
     "cssnano": "^5.0.16",
     "del": "^6.0.0",
     "fastify": "^3.27.1",
-    "fastify-compress": "^3.7.0",
+    "fastify-compress": "^4.0.1",
     "fastify-static": "^4.5.0",
     "glob": "^7.2.0",
     "gulp": "^4.0.2",
