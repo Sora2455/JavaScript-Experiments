@@ -5,13 +5,13 @@
   "license": "MIT",
   "type": "module",
   "dependencies": {
-    "autoprefixer": "^10.4.2",
-    "cssnano": "^5.0.16",
-    "del": "^6.0.0",
-    "fastify": "^3.27.1",
-    "fastify-compress": "^4.0.1",
-    "fastify-static": "^4.5.0",
-    "glob": "^7.2.0",
+    "@fastify/compress": "^6.1.0",
+    "@fastify/static": "^6.4.0",
+    "autoprefixer": "^10.4.7",
+    "cssnano": "^5.1.12",
+    "del": "^6.1.1",
+    "fastify": "^4.2.0",
+    "glob": "^8.0.3",
     "gulp": "^4.0.2",
     "gulp-buster": "^1.1.0",
     "gulp-ext-replace": "^0.3.0",
@@ -26,9 +26,9 @@
     "gulp-uglify": "^3.0.2",
     "imagemin-webp": "^7.0.0",
     "path": "^0.12.7",
-    "postcss": "^8.4.6",
-    "pureimage": "^0.3.8",
-    "typescript": "^4.5.5",
+    "postcss": "^8.4.14",
+    "pureimage": "^0.3.14",
+    "typescript": "^4.7.4",
     "uglify-es": "^3.3.9"
   },
   "devDependencies": {
@@ -36,11 +36,11 @@
     "fluent-ffmpeg": "^2.1.2",
     "geckodriver": "^3.0.1",
     "gulp-real-favicon": "^0.3.2",
-    "mocha": "^9.2.0",
-    "selenium-webdriver": "^4.1.1",
-    "stylelint": "^14.3.0",
-    "stylelint-config-standard": "^24.0.0",
-    "stylelint-no-unsupported-browser-features": "^5.0.2"
+    "mocha": "^9.2.2",
+    "selenium-webdriver": "^4.3.0",
+    "stylelint": "^14.9.1",
+    "stylelint-config-standard": "^26.0.0",
+    "stylelint-no-unsupported-browser-features": "^5.0.3"
   },
   "scripts": {
     "test": "mocha"

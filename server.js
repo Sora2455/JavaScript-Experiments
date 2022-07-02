@@ -3,8 +3,8 @@ import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import fastify from 'fastify';
-import compression from 'fastify-compress';
-import serveStatic from 'fastify-static';
+import compression from '@fastify/compress';
+import serveStatic from '@fastify/static';
 import { make, encodePNGToStream } from 'pureimage';
 import { QRCodeModel, _getTypeNumber } from "./build/modules/modules/QRCodeRenderer.js";
 
