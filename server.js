@@ -44,7 +44,8 @@ server.listen(8080, function (err, address) {
 function setHeaders(res, path, stat){
     if (path.endsWith(".html")) {
         res.setHeader("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; " +
-            "object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self';");
+            "object-src 'none'; script-src 'self' 'wasm-unsafe-eval'; base-uri 'self'; form-action 'self'; " +
+            "frame-ancestors 'self';");
             //"trusted-types; require-trusted-types-for 'script';"); TODO implement after cleaning up LazyLoad, SafeComments
         res.setHeader("Referrer-Policy", "same-origin");
         res.setHeader("Permissions-Policy", "sync-xhr=(), sync-script=(), legacy-image-formats=(), " +
